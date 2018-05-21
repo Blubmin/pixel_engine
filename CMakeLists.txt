@@ -10,9 +10,9 @@ find_package(OpenGL REQUIRED)
 # Third Party Libraries
 add_subdirectory(third_party)
 
-# PixelEngines
-include_directories(include)
-add_subdirectory(src)
+# PixelEngine
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+add_subdirectory(pixel_engine)
 
 # Examples
 add_subdirectory(examples)

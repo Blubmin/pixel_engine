@@ -13,12 +13,14 @@ add_library(pixel_engine
   ${HEADER_FILES}
 )
 
-target_include_directories(pixel_engine
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+target_include_directories(pixel_engine PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/third_party/gl3w/include
 )
 
 target_link_libraries(pixel_engine
-  ${OpenGL_LIBRRIES}
+  ${OPENGL_LIBRRIES}
+  gl3w
   glfw
 )
 

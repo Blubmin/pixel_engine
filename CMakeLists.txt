@@ -9,6 +9,7 @@ find_package(OpenGL REQUIRED)
 
 # Third Party Libraries
 add_subdirectory(third_party)
+include_directories(third_party/gl3w/include)
 
 # PixelEngine
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

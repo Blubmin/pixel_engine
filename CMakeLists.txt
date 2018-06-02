@@ -14,6 +14,7 @@ find_package(OpenGL REQUIRED)
 add_subdirectory(third_party)
 include_directories(third_party/gl3w/include)
 include_directories(third_party/glog/src)
+include_directories(third_party/gflags/src)
 
 # PixelEngine
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

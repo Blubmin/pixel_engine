@@ -1,3 +1,9 @@
 [submodule "glfw"]
 	path = third_party/glfw
 	url = git@github.com:Blubmin/glfw.git
+[submodule "third_party/glog"]
+	path = third_party/glog
+	url = https://github.com/Blubmin/glog.git
+[submodule "third_party/gflags"]
+	path = third_party/gflags
+	url = https://github.com/Blubmin/gflags.git

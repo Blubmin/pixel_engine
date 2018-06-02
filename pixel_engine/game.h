@@ -4,10 +4,13 @@
 
 namespace pixel_engine {
 class Game {
-  public:
-    Game(const std::string& game_name);
+ public:
+  Game(const std::string& game_name);
 
-  private:
-    std::string game_name_;
+  virtual void Init() = 0;
+  virtual void Loop() = 0;
+
+ private:
+  std::string game_name_;
 };
-}
+}  // namespace pixel_engine

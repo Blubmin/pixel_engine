@@ -6,3 +6,10 @@ add_subdirectory(glfw)
 
 # GL3W
 add_subdirectory(gl3w)
+
+# gflags
+add_subdirectory(gflags)
+
+# glog
+set(WITH_GFLAGS OFF)
+add_subdirectory(glog)

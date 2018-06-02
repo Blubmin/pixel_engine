@@ -18,10 +18,14 @@ target_include_directories(pixel_engine PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/third_party/gl3w/include
 )
 
+message(STATUS "gflag_LIBRARIES=${gflag_LIBRARIES}")
+
 target_link_libraries(pixel_engine
   ${OPENGL_LIBRRIES}
   gl3w
   glfw
+  gflags
+  glog
 )
 
 set(PIXEL_ENGINE_HEADER_FILES "")

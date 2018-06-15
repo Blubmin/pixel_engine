@@ -1,9 +1,9 @@
 #include <glog/logging.h>
 #include <pixel_engine/game.h>
 
-class HelloGame : public pixel_engine::Game {
+class HelloGame : public pxl::Game {
  public:
-  HelloGame() : pixel_engine::Game("Hello Game") {}
+  HelloGame() : pxl::Game("Hello Game") {}
   void Init() override {}
   void Loop() override {
     LOG(INFO) << Game::State.window_width << ", " << Game::State.window_height;

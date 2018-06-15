@@ -13,3 +13,8 @@ add_subdirectory(gflags)
 # glog
 set(WITH_GFLAGS OFF)
 add_subdirectory(glog)
+
+#assimp
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
+set(ASSIMP_BUILD_TESTS OFF)
+add_subdirectory(assimp)

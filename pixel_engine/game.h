@@ -6,7 +6,7 @@
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
-namespace pixel_engine {
+namespace pxl {
 struct GameState {
   std::string game_name;
   GLFWwindow* window;
@@ -27,4 +27,4 @@ class Game {
   static GameState State;
   static void WindowResizeCallback(GLFWwindow* window, int width, int height);
 };
-}  // namespace pixel_engine
+}  // namespace pxl

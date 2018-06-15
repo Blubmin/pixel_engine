@@ -1,10 +1,16 @@
 list(APPEND SOURCE_FILES
   game.cpp
+  game_mode.cpp
+  mesh.cpp
+  mesh_loader.cpp
   program.cpp
 )
 
 list(APPEND HEADER_FILES
   game.h
+  game_mode.h
+  mesh.h
+  mesh_loader.h
   program.h
 )
 
@@ -16,12 +22,12 @@ add_library(pixel_engine
 target_include_directories(pixel_engine PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/third_party/gl3w/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/third_party/assimp/include
 )
-
-message(STATUS "gflag_LIBRARIES=${gflag_LIBRARIES}")
 
 target_link_libraries(pixel_engine
   ${OPENGL_LIBRRIES}
+  assimp
   gl3w
   glfw
   gflags

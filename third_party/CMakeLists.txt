@@ -8,13 +8,16 @@ add_subdirectory(glfw)
 add_subdirectory(gl3w)
 
 # gflags
+set(GFLAGS_BUILD_TESTING OFF)
+set(GFLAGS_BUILD_gflags_nothreads_LIB OFF)
+set(GFLAGS_BUILD_gflags_LIB ON)
 add_subdirectory(gflags)
 
 # glog
 set(WITH_GFLAGS OFF)
 add_subdirectory(glog)
 
-#assimp
+# Assimp
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
 set(ASSIMP_BUILD_TESTS OFF)
 add_subdirectory(assimp)

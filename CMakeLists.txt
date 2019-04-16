@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 project(PixelEngine
   VERSION 1.0.0
-  LANGUAGES CXX
 )
+set(CMAKE_CXX_STANDARD 20)
 
 set(prefix ${CMAKE_PREFIX_PATH})
 set(build_prefix ${CMAKE_PREFIX_PATH})
@@ -10,8 +10,12 @@ set(build_prefix ${CMAKE_PREFIX_PATH})
 # OpenGL
 find_package(OpenGL REQUIRED)
 
+# Boost
+find_package(Boost REQUIRED filesystem)
+
 # Third Party Libraries
 include_directories(third_party/assimp/include)
+include_directories(third_party/eigen)
 include_directories(third_party/gl3w/include)
 include_directories(third_party/glog/src)
 include_directories(third_party/gflags/src)

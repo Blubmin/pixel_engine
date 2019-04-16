@@ -28,6 +28,7 @@ target_include_directories(pixel_engine PUBLIC
 target_link_libraries(pixel_engine
   ${OPENGL_LIBRRIES}
   assimp
+  Boost::filesystem
   gl3w
   glfw
   gflags

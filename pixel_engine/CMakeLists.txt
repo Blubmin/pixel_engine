@@ -3,6 +3,7 @@ list(APPEND SOURCE_FILES
   game_mode.cpp
   mesh.cpp
   mesh_loader.cpp
+  ogl_mesh.cpp
   program.cpp
 )
 
@@ -11,6 +12,7 @@ list(APPEND HEADER_FILES
   game_mode.h
   mesh.h
   mesh_loader.h
+  ogl_mesh.h
   program.h
 )
 

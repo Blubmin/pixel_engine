@@ -1,16 +1,16 @@
 #pragma once
 
-#include <filesystem>
 #include <map>
 #include <string>
 
 #include <GL/gl3w.h>
+#include <boost/filesystem.hpp>
 
 namespace pxl {
 class Program {
  public:
-  Program(const std::experimental::filesystem::path& vertex_shader,
-          const std::experimental::filesystem::path& fragment_shader);
+  Program(const boost::filesystem::path& vertex_shader,
+          const boost::filesystem::path& fragment_shader);
   ~Program();
 
   void Bind();
@@ -27,8 +27,7 @@ class Program {
   std::map<std::string, GLuint> attributes_;
   std::map<std::string, GLuint> uniforms_;
 
-  GLuint LoadShader(const std::experimental::filesystem::path& shader_path,
-                    GLenum shader);
+  GLuint LoadShader(const boost::filesystem::path& shader_path, GLenum shader);
   void LoadAttributes();
   void LoadUniforms();
 };

@@ -4,26 +4,25 @@
 #include <GLFW/glfw3.h>
 #include <glog/logging.h>
 
-namespace pxl
-{
-namespace
-{
-void GLFWErrorCallback(int error, const char *description)
-{
+namespace pxl {
+namespace {
+void GLFWErrorCallback(int error, const char *description) {
   LOG(FATAL) << error << ":" << description;
 }
-} // namespace
+}  // namespace
+
+float GameState::GetAspectRatio() {
+  return window_width / float(window_height);
+}
 
 GameState Game::State;
 
-Game::Game(const std::string &game_name)
-{
+Game::Game(const std::string &game_name) {
   State.game_name = game_name;
   State.window = nullptr;
 
   glfwSetErrorCallback(GLFWErrorCallback);
-  if (glfwInit() != GLFW_TRUE)
-  {
+  if (glfwInit() != GLFW_TRUE) {
     CHECK(false) << "glfwInit failed.";
   }
 
@@ -31,18 +30,15 @@ Game::Game(const std::string &game_name)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
   State.window =
       glfwCreateWindow(1920, 1080, State.game_name.c_str(), NULL, NULL);
-  if (State.window == nullptr)
-  {
+  if (State.window == nullptr) {
     CHECK(false) << "glfwCreateWindow failed.";
   }
   glfwMakeContextCurrent(State.window);
 
-  if (gl3wInit())
-  {
+  if (gl3wInit()) {
     LOG(FATAL) << "gl3wInit failed";
   }
-  if (!gl3wIsSupported(4, 5))
-  {
+  if (!gl3wIsSupported(4, 5)) {
     LOG(FATAL) << "OpenGL 4.5 not supported";
   }
 
@@ -53,6 +49,10 @@ Game::Game(const std::string &game_name)
   glfwSwapInterval(1);
   glClearColor(.3f, .3f, .3f, 1.f);
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA,
+                      GL_DST_ALPHA);
+  glBlendEquation(GL_FUNC_ADD);
 
   int width;
   int height;
@@ -63,14 +63,13 @@ Game::Game(const std::string &game_name)
   glfwSetWindowSizeCallback(State.window, Game::WindowResizeCallback);
 }
 
-Game::~Game() { glfwDestroyWindow(State.window); }
+Game::~Game() {}
 
-void Game::Run()
-{
+void Game::Run() {
+  Init();
   glClearColor(.3, .3, .3, 1);
 
-  while (!glfwWindowShouldClose(State.window))
-  {
+  while (!glfwWindowShouldClose(State.window)) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Run implemented game loop
@@ -79,17 +78,15 @@ void Game::Run()
     glfwSwapBuffers(State.window);
     glfwPollEvents();
 
-    if (glfwGetKey(State.window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
+    if (glfwGetKey(State.window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(State.window, GLFW_TRUE);
     }
   }
 }
 
-void Game::WindowResizeCallback(GLFWwindow *window, int width, int height)
-{
+void Game::WindowResizeCallback(GLFWwindow *window, int width, int height) {
   State.window_width = width;
   State.window_height = height;
   glViewport(0, 0, width, height);
 }
-} // namespace pxl
+}  // namespace pxl

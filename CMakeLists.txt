@@ -14,6 +14,7 @@ find_package(OpenGL REQUIRED)
 find_package(Boost REQUIRED filesystem)
 
 # Third Party Libraries
+include_directories(third_party)
 include_directories(third_party/assimp/include)
 include_directories(third_party/eigen)
 include_directories(third_party/gl3w/include)

@@ -12,6 +12,8 @@ struct GameState {
   GLFWwindow* window;
   std::atomic<int> window_width;
   std::atomic<int> window_height;
+
+  float GetAspectRatio();
 };
 
 class Game {

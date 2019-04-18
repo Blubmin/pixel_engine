@@ -12,8 +12,8 @@ namespace {
 const int kBufferSize = 255;
 }
 
-Program::Program(const std::experimental::filesystem::path& vertex_shader,
-                 const std::experimental::filesystem::path& fragment_shader) {
+Program::Program(const boost::filesystem::path& vertex_shader,
+                 const boost::filesystem::path& fragment_shader) {
   vertex_id_ = LoadShader(vertex_shader, GL_VERTEX_SHADER);
   fragment_id_ = LoadShader(fragment_shader, GL_FRAGMENT_SHADER);
 
@@ -31,13 +31,15 @@ Program::Program(const std::experimental::filesystem::path& vertex_shader,
     glGetProgramiv(prog_id_, GL_INFO_LOG_LENGTH, &max_length);
     std::vector<GLchar> info_log(max_length);
     glGetProgramInfoLog(prog_id_, max_length, &max_length, info_log.data());
-    LOG(ERROR) << info_log.data();
+    LOG(FATAL) << info_log.data();
 
     // Cleanup
     glDeleteProgram(prog_id_);
     glDeleteShader(vertex_id_);
     glDeleteShader(fragment_id_);
   }
+  LoadAttributes();
+  LoadUniforms();
 }
 
 Program::~Program() {
@@ -66,17 +68,16 @@ GLint Program::GetUniformLocation(const std::string& name) {
   return uniforms_.at(name);
 }
 
-GLuint Program::LoadShader(
-    const std::experimental::filesystem::path& shader_path,
-    GLenum shader_type) {
+GLuint Program::LoadShader(const boost::filesystem::path& shader_path,
+                           GLenum shader_type) {
   // Load shader into a string
-  std::ostringstream shader_code;
+  std::stringstream shader_code;
   std::ifstream shader_file;
   shader_file.open(shader_path.native());
   if (shader_file.is_open()) {
     std::string line;
     while (std::getline(shader_file, line)) {
-      shader_code << line;
+      shader_code << line << std::endl;
     }
   } else {
     LOG(ERROR) << "Could not open " << shader_path.string();
@@ -85,9 +86,10 @@ GLuint Program::LoadShader(
 
   // Bind Shader to GPU
   auto shader_id = glCreateShader(shader_type);
-  const char* shader_code_string = shader_code.str().c_str();
-  GLint code_size = strlen(shader_code_string);
-  glShaderSource(shader_id, 1, &shader_code_string, &code_size);
+  std::string shader_code_string = shader_code.str();
+  const GLchar* data = shader_code_string.data();
+  GLint code_size = shader_code_string.size() + 1;
+  glShaderSource(shader_id, 1, &data, &code_size);
   glCompileShader(shader_id);
 
   // Error handling
@@ -98,12 +100,10 @@ GLuint Program::LoadShader(
     glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &log_length);
     std::vector<GLchar> log_string(log_length);
     glGetShaderInfoLog(shader_id, log_length, NULL, log_string.data());
-    LOG(ERROR) << log_string.data();
+    LOG(FATAL) << shader_path << ":" << log_string.data();
     glDeleteShader(shader_id);
     return 0;
   }
-  LoadAttributes();
-  LoadUniforms();
   return shader_id;
 }
 
@@ -113,7 +113,9 @@ void Program::LoadAttributes() {
   attributes_.clear();
   for (int i = 0; i < num_active_attributes; i++) {
     std::vector<char> name_data(kBufferSize, 0);
-    glGetActiveAttrib(prog_id_, i, kBufferSize, NULL, NULL, NULL,
+    GLint size;
+    GLenum type;
+    glGetActiveAttrib(prog_id_, i, kBufferSize, NULL, &size, &type,
                       name_data.data());
     std::string name(name_data.data());
     attributes_[name] = glGetAttribLocation(prog_id_, name.c_str());
@@ -128,7 +130,9 @@ void Program::LoadUniforms() {
   uniforms_.clear();
   for (int i = 0; i < num_active_uniforms; i++) {
     std::vector<char> name_data(kBufferSize, 0);
-    glGetActiveUniform(prog_id_, i, kBufferSize, NULL, NULL, NULL,
+    GLint size;
+    GLenum type;
+    glGetActiveUniform(prog_id_, i, kBufferSize, NULL, &size, &type,
                        name_data.data());
     std::string name(name_data.data());
     uniforms_[name] = glGetUniformLocation(prog_id_, name.c_str());

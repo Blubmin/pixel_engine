@@ -5,6 +5,9 @@ list(APPEND SOURCE_FILES
   mesh_loader.cpp
   ogl_mesh.cpp
   program.cpp
+  entity.cpp
+  component.cpp
+  camera.cpp
 )
 
 list(APPEND HEADER_FILES
@@ -14,6 +17,9 @@ list(APPEND HEADER_FILES
   mesh_loader.h
   ogl_mesh.h
   program.h
+  entity.h
+  component.h
+  camera.h
 )
 
 add_library(pixel_engine

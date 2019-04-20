@@ -5,6 +5,8 @@
 
 #include <Eigen/Core>
 
+#include <pixel_engine/entity.h>
+
 namespace pxl {
 class SubMesh {
  public:
@@ -14,7 +16,7 @@ class SubMesh {
   std::vector<float> texture_coordinates;
 };
 
-class Mesh {
+class Mesh : public Entity {
  public:
   virtual ~Mesh() {}
   virtual void Bind() {}

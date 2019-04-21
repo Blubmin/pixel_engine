@@ -6,7 +6,9 @@
 #include <pixel_engine/camera.h>
 #include <pixel_engine/game.h>
 #include <pixel_engine/mesh_loader.h>
+#include <pixel_engine/ogl_framebuffer.h>
 #include <pixel_engine/ogl_mesh.h>
+#include <pixel_engine/ogl_texture_renderer.h>
 #include <pixel_engine/program.h>
 #include <Eigen/Geometry>
 
@@ -28,11 +30,16 @@ class HelloGame : public pxl::Game {
   void Init() override {
     mesh = pxl::MeshLoader::LoadMesh<pxl::OglMesh>(GetMeshPath("bunny.obj"));
     mesh->Bind();
+
     prog = std::shared_ptr<pxl::Program>(new pxl::Program(
         GetShaderPath("mesh.vert"), GetShaderPath("mesh.frag")));
     camera.position += Eigen::Vector3f(0, 0, 5);
+
+    framebuffer = std::make_shared<pxl::OglFramebuffer>(1920, 1080);
+    framebuffer->Bind();
   }
   void Loop() override {
+    framebuffer->Start();
     prog->Bind();
 
     glUniformMatrix4fv(prog->GetUniformLocation("u_model"), 1, GL_FALSE,
@@ -43,8 +50,13 @@ class HelloGame : public pxl::Game {
                        camera.GetPerspective().data());
 
     mesh->Draw();
+    prog->UnBind();
+    framebuffer->End();
+
+    pxl::OglTextureRenderer::RenderTexture(*framebuffer->GetColorAttachment(0));
   }
 
+  std::shared_ptr<pxl::OglFramebuffer> framebuffer;
   pxl::Camera camera;
   std::shared_ptr<pxl::OglMesh> mesh;
   std::shared_ptr<pxl::Program> prog;

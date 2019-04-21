@@ -1,25 +1,35 @@
 list(APPEND SOURCE_FILES
-  game.cpp
-  game_mode.cpp
-  mesh.cpp
-  mesh_loader.cpp
-  ogl_mesh.cpp
-  program.cpp
-  entity.cpp
-  component.cpp
   camera.cpp
+  component.cpp
+  entity.cpp
+  game_mode.cpp
+  game.cpp
+  mesh_loader.cpp
+  mesh.cpp
+  ogl_framebuffer.cpp
+  ogl_mesh.cpp
+  ogl_texture2d.cpp
+  ogl_texture_renderer.cpp
+  ogl_utilities.cpp
+  program.cpp
+  texture2d.cpp
 )
 
 list(APPEND HEADER_FILES
-  game.h
-  game_mode.h
-  mesh.h
-  mesh_loader.h
-  ogl_mesh.h
-  program.h
-  entity.h
-  component.h
   camera.h
+  component.h
+  entity.h
+  game_mode.h
+  game.h
+  mesh_loader.h
+  mesh.h
+  ogl_framebuffer.h
+  ogl_mesh.h
+  ogl_texture2d.h
+  ogl_texture_renderer.h
+  ogl_utilities.h
+  program.h
+  texture2d.h
 )
 
 add_library(pixel_engine

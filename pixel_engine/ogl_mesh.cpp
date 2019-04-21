@@ -2,40 +2,6 @@
 #include <pixel_engine/ogl_mesh.h>
 
 namespace pxl {
-namespace {
-std::string GetErrorString(GLenum err) {
-  switch (err) {
-    case GL_NO_ERROR:
-      return "GL_NO_ERROR";
-    case GL_INVALID_ENUM:
-      return "GL_INVALID_ENUM";
-    case GL_INVALID_VALUE:
-      return "GL_INVALID_VALUE";
-    case GL_INVALID_OPERATION:
-      return "GL_INVALID_OPERATION";
-    case GL_INVALID_FRAMEBUFFER_OPERATION:
-      return "GL_INVALID_FRAMEBUFFER_OPERATION";
-    case GL_OUT_OF_MEMORY:
-      return "GL_OUT_OF_MEMORY";
-    case GL_STACK_UNDERFLOW:
-      return "GL_STACK_UNDERFLOW";
-    case GL_STACK_OVERFLOW:
-      return "GL_STACK_OVERFLOW";
-    default:
-      return "UNKNOWN_ERROR";
-  }
-}
-void CheckGlError(const char* file, int line) {
-  GLenum err = glGetError();
-  if (err != GL_NO_ERROR) {
-    std::stringstream err_str;
-    err_str << file << ":" << line << " ";
-    err_str << "OpenGL Error(" << err << "): ";
-    err_str << GetErrorString(err);
-    LOG(FATAL) << err_str.str();
-  }
-}
-}  // namespace
 OglMesh::~OglMesh() {
   if (!vaos.empty()) {
     glDeleteVertexArrays(vaos.size(), vaos.data());

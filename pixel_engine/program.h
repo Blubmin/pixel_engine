@@ -11,6 +11,7 @@ class Program {
  public:
   Program(const boost::filesystem::path& vertex_shader,
           const boost::filesystem::path& fragment_shader);
+  Program(const boost::filesystem::path& compute_shader);
   ~Program();
 
   void Bind();
@@ -23,6 +24,7 @@ class Program {
   GLuint prog_id_;
   GLuint vertex_id_;
   GLuint fragment_id_;
+  GLuint compute_id_;
 
   std::map<std::string, GLuint> attributes_;
   std::map<std::string, GLuint> uniforms_;

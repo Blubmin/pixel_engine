@@ -7,6 +7,7 @@
 #include <pixel_engine/game.h>
 #include <pixel_engine/mesh_loader.h>
 #include <pixel_engine/ogl_framebuffer.h>
+#include <pixel_engine/ogl_fxaa_renderer.h>
 #include <pixel_engine/ogl_mesh.h>
 #include <pixel_engine/ogl_texture_renderer.h>
 #include <pixel_engine/program.h>
@@ -33,10 +34,14 @@ class HelloGame : public pxl::Game {
 
     prog = std::shared_ptr<pxl::Program>(new pxl::Program(
         GetShaderPath("mesh.vert"), GetShaderPath("mesh.frag")));
-    camera.position += Eigen::Vector3f(0, 0, 5);
+    camera.position += Eigen::Vector3f(0, -.2, 1);
 
     framebuffer = std::make_shared<pxl::OglFramebuffer>(1920, 1080);
     framebuffer->Bind();
+
+    fxaa_output = std::make_shared<pxl::OglTexture2d>(
+        1920, 1080, pxl::Texture2d::Format::FLOAT);
+    fxaa_output->Bind();
   }
   void Loop() override {
     framebuffer->Start();
@@ -53,10 +58,11 @@ class HelloGame : public pxl::Game {
     prog->UnBind();
     framebuffer->End();
 
-    pxl::OglTextureRenderer::RenderTexture(*framebuffer->GetColorAttachment(0));
+    pxl::OglFxaaRenderer::RenderTexture(*framebuffer->GetColorAttachment(0));
   }
 
   std::shared_ptr<pxl::OglFramebuffer> framebuffer;
+  std::shared_ptr<pxl::OglTexture2d> fxaa_output;
   pxl::Camera camera;
   std::shared_ptr<pxl::OglMesh> mesh;
   std::shared_ptr<pxl::Program> prog;

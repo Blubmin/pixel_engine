@@ -14,5 +14,5 @@ void main() {
     vec3 half_vec = normalize(light + view);
     float diffuse = max(dot(half_vec, v_norm), 0);
 
-    f_color = vec3(.6, .6, .6) * diffuse;
+    f_color = vec3(.55, .55, .55) * diffuse + vec3(.05, .05, .05); 
 }

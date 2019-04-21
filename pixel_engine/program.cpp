@@ -42,10 +42,36 @@ Program::Program(const boost::filesystem::path& vertex_shader,
   LoadUniforms();
 }
 
+Program::Program(const boost::filesystem::path& compute_shader) {
+  compute_id_ = LoadShader(compute_shader, GL_COMPUTE_SHADER);
+
+  prog_id_ = glCreateProgram();
+  glAttachShader(prog_id_, compute_id_);
+
+  // Error checking
+  glLinkProgram(prog_id_);
+  GLint is_linked = 0;
+  glGetProgramiv(prog_id_, GL_LINK_STATUS, &is_linked);
+  if (is_linked == GL_FALSE) {
+    // Get error
+    GLint max_length = 0;
+    glGetProgramiv(prog_id_, GL_INFO_LOG_LENGTH, &max_length);
+    std::vector<GLchar> info_log(max_length);
+    glGetProgramInfoLog(prog_id_, max_length, &max_length, info_log.data());
+    LOG(FATAL) << info_log.data();
+
+    // Cleanup
+    glDeleteShader(compute_id_);
+  }
+  LoadAttributes();
+  LoadUniforms();
+}
+
 Program::~Program() {
   glDeleteProgram(prog_id_);
   glDeleteShader(vertex_id_);
   glDeleteShader(fragment_id_);
+  glDeleteShader(compute_id_);
 }
 
 void Program::Bind() { glUseProgram(prog_id_); }

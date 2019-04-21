@@ -7,6 +7,7 @@ list(APPEND SOURCE_FILES
   mesh_loader.cpp
   mesh.cpp
   ogl_framebuffer.cpp
+  ogl_fxaa_renderer.cpp
   ogl_mesh.cpp
   ogl_texture2d.cpp
   ogl_texture_renderer.cpp
@@ -24,6 +25,7 @@ list(APPEND HEADER_FILES
   mesh_loader.h
   mesh.h
   ogl_framebuffer.h
+  ogl_fxaa_renderer.h
   ogl_mesh.h
   ogl_texture2d.h
   ogl_texture_renderer.h

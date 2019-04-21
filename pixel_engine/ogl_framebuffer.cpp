@@ -2,6 +2,7 @@
 
 #include <glog/logging.h>
 
+#include <pixel_engine/game.h>
 #include <pixel_engine/ogl_utilities.h>
 
 namespace pxl {
@@ -45,12 +46,15 @@ void OglFramebuffer::Bind() {
 
 void OglFramebuffer::Start() {
   glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id_);
+  glViewport(0, 0, width_, height_);
+  glClearColor(.3f, .3f, .3f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void OglFramebuffer::End() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClearColor(.3f, .3f, .3f, 1.f);
+  glViewport(0, 0, Game::State.window_width, Game::State.window_height);
 }
 
 std::shared_ptr<OglTexture2d> OglFramebuffer::GetColorAttachment(

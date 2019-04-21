@@ -14,6 +14,10 @@ class Texture2d {
 
   virtual void Bind(){};
 
+  uint32_t GetWidth() const;
+  uint32_t GetHeight() const;
+  Format GetFormat() const;
+
  protected:
   uint32_t width;
   uint32_t height;

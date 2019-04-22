@@ -43,12 +43,6 @@ add_library(pixel_engine
   ${HEADER_FILES}
 )
 
-target_include_directories(pixel_engine PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/third_party/gl3w/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/third_party/assimp/include
-)
-
 target_link_libraries(pixel_engine
   ${OPENGL_LIBRRIES}
   assimp
@@ -57,6 +51,7 @@ target_link_libraries(pixel_engine
   glfw
   gflags
   glog
+  imgui_glfw_opengl3
 )
 
 set(PIXEL_ENGINE_HEADER_FILES "")

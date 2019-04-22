@@ -8,18 +8,17 @@
 #include <pixel_engine/game.h>
 
 namespace pxl {
-Camera::Camera() : fov(90), near_plane(0.01), far_plane(1000) {}
+Camera::Camera() : fov(90.f), near_plane(0.01f), far_plane(1000.f) {}
 
 Eigen::Matrix4f Camera::GetPerspective() {
   Eigen::Matrix4f perspective = Eigen::Matrix4f::Zero();
-  float t =
-      1 / (std::tan(fov / 2.f * M_PI / 180.f) * Game::State.GetAspectRatio());
-  float s = 1 / (std::tan(fov / 2.f * M_PI / 180.f));
-  perspective(0, 0) = t;
-  perspective(1, 1) = s;
+  float half_tan = std::tan(fov / 2.f * M_PI / 180.f);
+  perspective(0, 0) = 1 / (half_tan * Game::State.GetAspectRatio());
+  perspective(1, 1) = 1 / half_tan;
   perspective(2, 2) = (far_plane + near_plane) / (near_plane - far_plane);
   perspective(2, 3) = (2 * far_plane * near_plane) / (near_plane - far_plane);
   perspective(3, 2) = -1;
+  perspective(3, 3) = 1;
   return perspective;
 }
 

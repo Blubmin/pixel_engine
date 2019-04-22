@@ -21,3 +21,6 @@ add_subdirectory(glog)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
 set(ASSIMP_BUILD_TESTS OFF)
 add_subdirectory(assimp)
+
+# ImGui
+add_subdirectory(imgui)

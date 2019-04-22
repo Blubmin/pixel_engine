@@ -3,6 +3,7 @@
 
 #include <GL/gl3w.h>>
 #include <glog/logging.h>
+#include <imgui/imgui.h>
 #include <pixel_engine/camera.h>
 #include <pixel_engine/game.h>
 #include <pixel_engine/mesh_loader.h>
@@ -57,7 +58,12 @@ class HelloGame : public pxl::Game {
     prog->Bind();
 
     mesh->rotation += Eigen::Vector3f(0, M_PI / 120, 0);
-
+    if (ImGui::Begin("Property")) {
+      ImGui::DragFloat3("Position", mesh->position.data());
+      ImGui::DragFloat3("Rotation", mesh->rotation.data());
+      ImGui::DragFloat3("Scale", mesh->scale.data());
+      ImGui::End();
+    }
     glUniformMatrix4fv(prog->GetUniformLocation("u_model"), 1, GL_FALSE,
                        mesh->GetTransform().data());
     glUniformMatrix4fv(prog->GetUniformLocation("u_view"), 1, GL_FALSE,

@@ -97,3 +97,6 @@
 [submodule "third_party/CImg"]
 	path = third_party/CImg
 	url = https://github.com/dtschump/CImg.git
+[submodule "third_party/imgui"]
+	path = third_party/imgui
+	url = git@github.com:Blubmin/imgui.git

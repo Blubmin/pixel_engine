@@ -14,6 +14,8 @@ find_package(OpenGL REQUIRED)
 find_package(Boost REQUIRED filesystem)
 
 # Third Party Libraries
+add_definitions(-DImDrawIdx=uint32_t)
+add_definitions(-DIMGUI_DEFINE_MATH_OPERATORS)
 include_directories(third_party)
 include_directories(third_party/assimp/include)
 include_directories(third_party/eigen)

@@ -1,8 +1,16 @@
 #include <pixel_engine/game.h>
 
+#include <chrono>
+
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 #include <glog/logging.h>
+#include <boost/format.hpp>
+
+#include <imgui/imgui.h>
+
+#include <imgui/examples/imgui_impl_glfw.h>
+#include <imgui/examples/imgui_impl_opengl3.h>
 
 namespace pxl {
 namespace {
@@ -41,6 +49,7 @@ Game::Game(const std::string &game_name) {
   if (!gl3wIsSupported(4, 5)) {
     LOG(FATAL) << "OpenGL 4.5 not supported";
   }
+  const std::string glsl_version = "#version 450";
 
   LOG(INFO) << "OpenGL " << glGetString(GL_VERSION) << ", GLSL "
             << glGetString(GL_SHADING_LANGUAGE_VERSION);
@@ -54,6 +63,7 @@ Game::Game(const std::string &game_name) {
                       GL_DST_ALPHA);
   glBlendEquation(GL_FUNC_ADD);
 
+  /* Set Viewport */
   int width;
   int height;
   glfwGetFramebufferSize(State.window, &width, &height);
@@ -61,6 +71,22 @@ Game::Game(const std::string &game_name) {
   State.window_height = height;
   glViewport(0, 0, width, height);
   glfwSetWindowSizeCallback(State.window, Game::WindowResizeCallback);
+
+  /* Setup ImGui context */
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO &io = ImGui::GetIO();
+  // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard
+  // Controls io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable
+  // Gamepad Controls
+
+  // Setup Dear ImGui style
+  ImGui::StyleColorsDark();
+  // ImGui::StyleColorsClassic();
+
+  // Setup Platform/Renderer bindings
+  ImGui_ImplGlfw_InitForOpenGL(State.window, true);
+  ImGui_ImplOpenGL3_Init(glsl_version.c_str());
 }
 
 Game::~Game() {}
@@ -69,14 +95,43 @@ void Game::Run() {
   Init();
   glClearColor(.3, .3, .3, 1);
 
+  auto time = std::chrono::system_clock::now();
+
   while (!glfwWindowShouldClose(State.window)) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glfwPollEvents();
+
+    // Start the Dear ImGui frame
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
 
     // Run implemented game loop
     Loop();
 
+    auto now = std::chrono::system_clock::now();
+    auto time_spent = now - time;
+    time = now;
+    double fps =
+        1 / std::chrono::duration_cast<
+                std::chrono::duration<double, std::ratio<1, 1>>>(time_spent)
+                .count();
+    boost::format fps_format("%lf fps");
+    fps_format % ImGui::GetIO().Framerate;
+
+    ImVec2 fps_location = ImVec2(
+        State.window_width - ImGui::CalcTextSize(fps_format.str().c_str()).x,
+        0);
+
+    ImGui::GetOverlayDrawList()->AddText(fps_location, IM_COL32_WHITE,
+                                         fps_format.str().c_str());
+
+    // Rendering
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     glfwSwapBuffers(State.window);
-    glfwPollEvents();
 
     if (glfwGetKey(State.window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(State.window, GLFW_TRUE);

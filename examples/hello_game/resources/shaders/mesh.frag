@@ -25,7 +25,7 @@ vec3 view_vec;
 
 vec3 compute_point_light(PointLight light) {
     vec3 light_vec = normalize(light.pos - v_pos);
-    vec3 half_vec = normalize(light.pos + view_vec);
+    vec3 half_vec = normalize(light_vec + view_vec);
     float diffuse = max(dot(half_vec, normal_vec), 0);
 
     float dist = length(light.pos - v_pos);

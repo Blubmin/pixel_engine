@@ -15,6 +15,6 @@ out vec3 v_pos;
 
 void main() {
     gl_Position = u_perspective * u_view * u_model * vec4(a_pos, 1);
-    v_normal = (u_view * vec4(a_normal, 0)).xyz;
-    v_pos = (u_view * vec4(a_pos, 1)).xyz;
+    v_normal = (u_model * vec4(a_normal, 0)).xyz;
+    v_pos = (u_model * vec4(a_pos, 1)).xyz;
 }

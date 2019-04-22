@@ -10,8 +10,10 @@
 #include <pixel_engine/ogl_fxaa_renderer.h>
 #include <pixel_engine/ogl_mesh.h>
 #include <pixel_engine/ogl_texture_renderer.h>
+#include <pixel_engine/point_light.h>
 #include <pixel_engine/program.h>
 #include <Eigen/Geometry>
+#include <boost/format.hpp>
 
 namespace {
 boost::filesystem::path GetResourcePath() {
@@ -29,12 +31,14 @@ class HelloGame : public pxl::Game {
  public:
   HelloGame() : pxl::Game("Hello Game") {}
   void Init() override {
-    mesh = pxl::MeshLoader::LoadMesh<pxl::OglMesh>(GetMeshPath("bunny.obj"));
+    mesh =
+        pxl::MeshLoader::LoadMesh<pxl::OglMesh>(GetMeshPath("coca_cola.obj"));
     mesh->Bind();
+    mesh->scale = Eigen::Vector3f(.01, .01, .01);
 
     prog = std::shared_ptr<pxl::Program>(new pxl::Program(
         GetShaderPath("mesh.vert"), GetShaderPath("mesh.frag")));
-    camera.position += Eigen::Vector3f(0, -.2, 1);
+    camera.position += Eigen::Vector3f(0, .2, 5);
 
     framebuffer = std::make_shared<pxl::OglFramebuffer>(1920, 1080);
     framebuffer->Bind();
@@ -42,10 +46,17 @@ class HelloGame : public pxl::Game {
     fxaa_output = std::make_shared<pxl::OglTexture2d>(
         1920, 1080, pxl::Texture2d::Format::FLOAT);
     fxaa_output->Bind();
+
+    point_lights.emplace_back(pxl::Color(1, .8, .8));
+    point_lights.back().position += Eigen::Vector3f(2, 2, 0);
+    point_lights.emplace_back(pxl::Color(.8, .8, 1));
+    point_lights.back().position += Eigen::Vector3f(-2, 2, 0);
   }
   void Loop() override {
     framebuffer->Start();
     prog->Bind();
+
+    mesh->rotation += Eigen::Vector3f(0, M_PI / 120, 0);
 
     glUniformMatrix4fv(prog->GetUniformLocation("u_model"), 1, GL_FALSE,
                        mesh->GetTransform().data());
@@ -53,6 +64,27 @@ class HelloGame : public pxl::Game {
                        camera.GetView().data());
     glUniformMatrix4fv(prog->GetUniformLocation("u_perspective"), 1, GL_FALSE,
                        camera.GetPerspective().data());
+
+    glUniform3fv(prog->GetUniformLocation("u_camera_pos"), 1,
+                 camera.position.data());
+
+    glUniform1i(prog->GetUniformLocation("u_num_point_lights"),
+                point_lights.size());
+    for (size_t i = 0; i < point_lights.size(); ++i) {
+      const auto& point_light = point_lights.at(i);
+      boost::format array_format("u_point_lights[%u].");
+      array_format % i;
+      glUniform3fv(prog->GetUniformLocation(array_format.str() + "pos"), 1,
+                   point_light.position.data());
+      glUniform3fv(prog->GetUniformLocation(array_format.str() + "color"), 1,
+                   point_light.color.Data());
+      glUniform1fv(
+          prog->GetUniformLocation(array_format.str() + "linear_attenuation"),
+          1, &point_light.linear_attenuation);
+      glUniform1fv(prog->GetUniformLocation(array_format.str() +
+                                            "quadratic_attenuation"),
+                   1, &point_light.quadratic_attenuation);
+    }
 
     mesh->Draw();
     prog->UnBind();
@@ -66,6 +98,7 @@ class HelloGame : public pxl::Game {
   pxl::Camera camera;
   std::shared_ptr<pxl::OglMesh> mesh;
   std::shared_ptr<pxl::Program> prog;
+  std::vector<pxl::PointLight> point_lights;
 };
 
 int main(int argc, char* argv[]) {

@@ -1,5 +1,7 @@
 #version 430
 
+// http://blog.simonrodriguez.fr/articles/30-07-2016_implementing_fxaa.html
+
 in vec2 v_uv;
 
 uniform sampler2D in_image;

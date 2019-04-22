@@ -1,5 +1,6 @@
 list(APPEND SOURCE_FILES
   camera.cpp
+  color.cpp
   component.cpp
   entity.cpp
   game_mode.cpp
@@ -13,11 +14,13 @@ list(APPEND SOURCE_FILES
   ogl_texture_renderer.cpp
   ogl_utilities.cpp
   program.cpp
+  point_light.cpp
   texture2d.cpp
 )
 
 list(APPEND HEADER_FILES
   camera.h
+  color.h
   component.h
   entity.h
   game_mode.h
@@ -31,6 +34,7 @@ list(APPEND HEADER_FILES
   ogl_texture_renderer.h
   ogl_utilities.h
   program.h
+  point_light.h
   texture2d.h
 )
 

@@ -15,6 +15,7 @@ list(APPEND SOURCE_FILES
   ogl_utilities.cpp
   program.cpp
   point_light.cpp
+  scene.cpp
   texture2d.cpp
 )
 
@@ -35,6 +36,7 @@ list(APPEND HEADER_FILES
   ogl_utilities.h
   program.h
   point_light.h
+  scene.h
   texture2d.h
 )
 

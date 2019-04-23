@@ -32,14 +32,20 @@ class HelloGame : public pxl::Game {
  public:
   HelloGame() : pxl::Game("Hello Game") {}
   void Init() override {
-    mesh =
+    mesh = pxl::MeshLoader::LoadMesh<pxl::OglMesh>(GetMeshPath("bunny.obj"));
+    auto child =
         pxl::MeshLoader::LoadMesh<pxl::OglMesh>(GetMeshPath("coca_cola.obj"));
+    child->Bind();
+    child->scale = Eigen::Vector3f(.01f, .01f, .01f);
+    child->position = Eigen::Vector3f(1.f, 1.f, 0.f);
+    mesh->AddChild(child);
     mesh->Bind();
-    mesh->scale = Eigen::Vector3f(.01, .01, .01);
+    // mesh->scale = Eigen::Vector3f(.01, .01, .01);
+    mesh->rotation.y() = (M_PI / 2.f);
 
     prog = std::shared_ptr<pxl::Program>(new pxl::Program(
         GetShaderPath("mesh.vert"), GetShaderPath("mesh.frag")));
-    camera.position += Eigen::Vector3f(0, .2, 5);
+    camera.position += Eigen::Vector3f(0, 1, 10);
 
     framebuffer = std::make_shared<pxl::OglFramebuffer>(1920, 1080);
     framebuffer->Bind();
@@ -48,16 +54,20 @@ class HelloGame : public pxl::Game {
         1920, 1080, pxl::Texture2d::Format::FLOAT);
     fxaa_output->Bind();
 
-    point_lights.emplace_back(pxl::Color(1, .8, .8));
-    point_lights.back().position += Eigen::Vector3f(2, 2, 0);
-    point_lights.emplace_back(pxl::Color(.8, .8, 1));
-    point_lights.back().position += Eigen::Vector3f(-2, 2, 0);
+    point_lights.emplace_back(pxl::Color(1.f, .0f, .0f));
+    point_lights.back().position += Eigen::Vector3f(4.f, 2.f, 0.f);
+    point_lights.emplace_back(pxl::Color(.0f, .0f, 1.f));
+    point_lights.back().position += Eigen::Vector3f(-4.f, 2.f, 0.f);
+    point_lights.emplace_back(pxl::Color(.0f, 1.f, .0f));
+    point_lights.back().position += Eigen::Vector3f(-8.f, 2.f, 0.f);
+    point_lights.emplace_back(pxl::Color(.5f, .0f, 1.f));
+    point_lights.back().position += Eigen::Vector3f(8.f, 2.f, 0.f);
   }
   void Loop() override {
     framebuffer->Start();
     prog->Bind();
 
-    mesh->rotation += Eigen::Vector3f(0, M_PI / 120, 0);
+    mesh->rotation += Eigen::Vector3f(0, 6 / 4.f, 0);
     if (ImGui::Begin("Property")) {
       ImGui::DragFloat3("Position", mesh->position.data());
       ImGui::DragFloat3("Rotation", mesh->rotation.data());
@@ -92,7 +102,23 @@ class HelloGame : public pxl::Game {
                    1, &point_light.quadratic_attenuation);
     }
 
-    mesh->Draw();
+    for (int32_t i = -9; i < 10; i += 2) {
+      mesh->position.x() = float(i);
+      glUniformMatrix4fv(prog->GetUniformLocation("u_model"), 1, GL_FALSE,
+                         mesh->GetTransform().data());
+      mesh->Draw();
+      for (const auto& child : mesh->children) {
+        std::shared_ptr<pxl::Mesh> child_mesh =
+            std::dynamic_pointer_cast<pxl::Mesh>(child);
+        if (child_mesh == nullptr) {
+          continue;
+        }
+        glUniformMatrix4fv(prog->GetUniformLocation("u_model"), 1, GL_FALSE,
+                           child_mesh->GetTransform().data());
+        child_mesh->Draw();
+      }
+    }
+    // mesh->Draw();
     prog->UnBind();
     framebuffer->End();
 

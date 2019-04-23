@@ -1,7 +1,7 @@
 #include <pixel_engine/color.h>
 
 namespace pxl {
-Color::Color(float r, float g, float b, float a) : data_{r, b, g, a} {}
+Color::Color(float r, float g, float b, float a) : data_{r, g, b, a} {}
 
 float Color::R() const { return data_[0]; }
 

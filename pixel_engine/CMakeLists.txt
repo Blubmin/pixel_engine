@@ -16,7 +16,9 @@ list(APPEND SOURCE_FILES
   program.cpp
   point_light.cpp
   scene.cpp
+  scene_renderer.cpp
   texture2d.cpp
+  utilities.cpp
 )
 
 list(APPEND HEADER_FILES
@@ -37,7 +39,9 @@ list(APPEND HEADER_FILES
   program.h
   point_light.h
   scene.h
+  scene_renderer.h
   texture2d.h
+  utilities.h
 )
 
 add_library(pixel_engine

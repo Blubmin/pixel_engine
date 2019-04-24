@@ -20,6 +20,8 @@ class Program {
   GLint GetAttributeLocation(const std::string& name);
   GLint GetUniformLocation(const std::string& name);
 
+  void SetUniformMatrix4fv(const std::string& name, const float* data);
+
  private:
   GLuint prog_id_;
   GLuint vertex_id_;

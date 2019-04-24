@@ -13,6 +13,8 @@
 #include <pixel_engine/ogl_texture_renderer.h>
 #include <pixel_engine/point_light.h>
 #include <pixel_engine/program.h>
+#include <pixel_engine/scene.h>
+#include <pixel_engine/scene_renderer.h>
 #include <Eigen/Geometry>
 #include <boost/format.hpp>
 
@@ -45,7 +47,9 @@ class HelloGame : public pxl::Game {
 
     prog = std::shared_ptr<pxl::Program>(new pxl::Program(
         GetShaderPath("mesh.vert"), GetShaderPath("mesh.frag")));
-    camera.position += Eigen::Vector3f(0, 1, 10);
+
+    camera = std::make_shared<pxl::Camera>();
+    camera->position += Eigen::Vector3f(0, 1, 10);
 
     framebuffer = std::make_shared<pxl::OglFramebuffer>(1920, 1080);
     framebuffer->Bind();
@@ -62,12 +66,18 @@ class HelloGame : public pxl::Game {
     point_lights.back().position += Eigen::Vector3f(-8.f, 2.f, 0.f);
     point_lights.emplace_back(pxl::Color(.5f, .0f, 1.f));
     point_lights.back().position += Eigen::Vector3f(8.f, 2.f, 0.f);
+
+    scene = std::make_shared<pxl::Scene>();
+    scene->camera = camera;
+    scene->Bind();
   }
+
   void Loop() override {
     framebuffer->Start();
     prog->Bind();
 
     mesh->rotation += Eigen::Vector3f(0, 6 / 4.f, 0);
+    mesh->rotation.y() = fmod(mesh->rotation.y(), 360.f);
     if (ImGui::Begin("Property")) {
       ImGui::DragFloat3("Position", mesh->position.data());
       ImGui::DragFloat3("Rotation", mesh->rotation.data());
@@ -77,12 +87,12 @@ class HelloGame : public pxl::Game {
     glUniformMatrix4fv(prog->GetUniformLocation("u_model"), 1, GL_FALSE,
                        mesh->GetTransform().data());
     glUniformMatrix4fv(prog->GetUniformLocation("u_view"), 1, GL_FALSE,
-                       camera.GetView().data());
+                       camera->GetView().data());
     glUniformMatrix4fv(prog->GetUniformLocation("u_perspective"), 1, GL_FALSE,
-                       camera.GetPerspective().data());
+                       camera->GetPerspective().data());
 
     glUniform3fv(prog->GetUniformLocation("u_camera_pos"), 1,
-                 camera.position.data());
+                 camera->position.data());
 
     glUniform1i(prog->GetUniformLocation("u_num_point_lights"),
                 point_lights.size());
@@ -118,8 +128,9 @@ class HelloGame : public pxl::Game {
         child_mesh->Draw();
       }
     }
-    // mesh->Draw();
     prog->UnBind();
+
+    pxl::SceneRenderer::RenderScene(*scene);
     framebuffer->End();
 
     pxl::OglFxaaRenderer::RenderTexture(*framebuffer->GetColorAttachment(0));
@@ -127,7 +138,8 @@ class HelloGame : public pxl::Game {
 
   std::shared_ptr<pxl::OglFramebuffer> framebuffer;
   std::shared_ptr<pxl::OglTexture2d> fxaa_output;
-  pxl::Camera camera;
+  std::shared_ptr<pxl::Camera> camera;
+  std::shared_ptr<pxl::Scene> scene;
   std::shared_ptr<pxl::OglMesh> mesh;
   std::shared_ptr<pxl::Program> prog;
   std::vector<pxl::PointLight> point_lights;

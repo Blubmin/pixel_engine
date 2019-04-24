@@ -166,4 +166,8 @@ void Program::LoadUniforms() {
     VLOG(2) << "Uniform: " << name;
   }
 }
+
+void Program::SetUniformMatrix4fv(const std::string& name, const float* data) {
+  glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, data);
+}
 }  // namespace pxl

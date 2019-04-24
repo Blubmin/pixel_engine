@@ -8,6 +8,7 @@
 #include <boost/format.hpp>
 
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
 #include <imgui/examples/imgui_impl_glfw.h>
 #include <imgui/examples/imgui_impl_opengl3.h>
@@ -37,7 +38,7 @@ Game::Game(const std::string &game_name) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
   State.window =
-      glfwCreateWindow(1920, 1080, State.game_name.c_str(), NULL, NULL);
+      glfwCreateWindow(1280, 720, State.game_name.c_str(), NULL, NULL);
   if (State.window == nullptr) {
     CHECK(false) << "glfwCreateWindow failed.";
   }
@@ -120,9 +121,11 @@ void Game::Run() {
     boost::format fps_format("%lf fps");
     fps_format % ImGui::GetIO().Framerate;
 
-    ImVec2 fps_location = ImVec2(
-        State.window_width - ImGui::CalcTextSize(fps_format.str().c_str()).x,
-        0);
+    ImVec2 fps_location =
+        ImVec2(State.window_width -
+                   ImGui::CalcTextSize(fps_format.str().c_str()).x,
+               0) +
+        ImVec2(-10, 10);
 
     ImGui::GetOverlayDrawList()->AddText(fps_location, IM_COL32_WHITE,
                                          fps_format.str().c_str());

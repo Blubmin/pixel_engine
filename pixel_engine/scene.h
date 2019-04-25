@@ -8,6 +8,8 @@
 namespace pxl {
 class Scene {
  public:
+  void Update(float time_elapsed);
+
   void Bind();
   void DrawGrid() const;
   void DrawPose() const;

@@ -9,6 +9,15 @@ namespace pxl {
 Entity::Entity(std::shared_ptr<Entity> parent)
     : position(0, 0, 0), rotation(0, 0, 0), scale(1, 1, 1), parent(parent) {}
 
+void Entity::Update(float time_elapsed) {
+  for (auto component : components) {
+    component->Update(time_elapsed);
+  }
+  for (auto child : children) {
+    child->Update(time_elapsed);
+  }
+}
+
 void Entity::SetParent(std::shared_ptr<Entity> parent) {
   this->parent = parent;
 }
@@ -19,6 +28,14 @@ void Entity::AddChild(std::shared_ptr<Entity> child) {
   }
   children.push_back(child);
   child->SetParent(shared_from_this());
+}
+
+void Entity::AddComponent(std::shared_ptr<Component> component) {
+  if (component == nullptr) {
+    return;
+  }
+  components.push_back(component);
+  component->SetOwner(shared_from_this());
 }
 
 Eigen::Matrix4f Entity::GetTransform() {

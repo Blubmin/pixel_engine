@@ -3,6 +3,7 @@ list(APPEND SOURCE_FILES
   color.cpp
   component.cpp
   entity.cpp
+  free_camera_component.cpp
   game_mode.cpp
   game.cpp
   mesh_loader.cpp
@@ -26,6 +27,7 @@ list(APPEND HEADER_FILES
   color.h
   component.h
   entity.h
+  free_camera_component.h
   game_mode.h
   game.h
   mesh_loader.h

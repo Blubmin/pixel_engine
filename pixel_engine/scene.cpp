@@ -4,6 +4,12 @@ namespace pxl {
 namespace {
 const int kGridSize = 10;
 }
+void Scene::Update(float time_elapsed) {
+  for (auto entity : entities) {
+    entity->Update(time_elapsed);
+  }
+}
+
 void Scene::Bind() {
   // Grid
   std::vector<Eigen::Vector2f> grid_positions;

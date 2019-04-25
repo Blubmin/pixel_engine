@@ -1,10 +1,11 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#include <GL/gl3w.h>>
+#include <GL/gl3w.h>
 #include <glog/logging.h>
 #include <imgui/imgui.h>
 #include <pixel_engine/camera.h>
+#include <pixel_engine/free_camera_component.h>
 #include <pixel_engine/game.h>
 #include <pixel_engine/mesh_loader.h>
 #include <pixel_engine/ogl_framebuffer.h>
@@ -45,11 +46,17 @@ class HelloGame : public pxl::Game {
     // mesh->scale = Eigen::Vector3f(.01, .01, .01);
     mesh->rotation.y() = (M_PI / 2.f);
 
+    ground = pxl::MeshLoader::LoadMesh<pxl::OglMesh>(GetMeshPath("plane.obj"));
+    ground->Bind();
+    ground->scale = Eigen::Vector3f(10.f, 10.f, 10.f);
+    ground->rotation.x() = -90;
+
     prog = std::shared_ptr<pxl::Program>(new pxl::Program(
         GetShaderPath("mesh.vert"), GetShaderPath("mesh.frag")));
 
     camera = std::make_shared<pxl::Camera>();
     camera->position += Eigen::Vector3f(0, 1, 10);
+    camera->AddComponent(std::make_shared<pxl::FreeCameraComponent>());
 
     framebuffer = std::make_shared<pxl::OglFramebuffer>(1920, 1080);
     framebuffer->Bind();
@@ -69,14 +76,16 @@ class HelloGame : public pxl::Game {
 
     scene = std::make_shared<pxl::Scene>();
     scene->camera = camera;
+    scene->entities.push_back(camera);
     scene->Bind();
   }
 
-  void Loop() override {
+  void Update(float time_elapsed) override {
+    scene->Update(time_elapsed);
     framebuffer->Start();
     prog->Bind();
 
-    mesh->rotation += Eigen::Vector3f(0, 6 / 4.f, 0);
+    mesh->rotation += Eigen::Vector3f(0, 90 * time_elapsed, 0);
     mesh->rotation.y() = fmod(mesh->rotation.y(), 360.f);
     if (ImGui::Begin("Property")) {
       ImGui::DragFloat3("Position", mesh->position.data());
@@ -128,6 +137,9 @@ class HelloGame : public pxl::Game {
         child_mesh->Draw();
       }
     }
+    glUniformMatrix4fv(prog->GetUniformLocation("u_model"), 1, GL_FALSE,
+                       ground->GetTransform().data());
+    ground->Draw();
     prog->UnBind();
 
     pxl::SceneRenderer::RenderScene(*scene);
@@ -141,6 +153,7 @@ class HelloGame : public pxl::Game {
   std::shared_ptr<pxl::Camera> camera;
   std::shared_ptr<pxl::Scene> scene;
   std::shared_ptr<pxl::OglMesh> mesh;
+  std::shared_ptr<pxl::OglMesh> ground;
   std::shared_ptr<pxl::Program> prog;
   std::vector<pxl::PointLight> point_lights;
 };

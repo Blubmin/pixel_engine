@@ -35,11 +35,7 @@ void SceneRenderer::RenderScene(const Scene& scene) {
   auto view_matrix = scene.camera->GetView();
   view_matrix.block<3, 1>(0, 3) << 0.f, 0.f, 0.f;
   pose_prog_->SetUniformMatrix4fv("u_view", view_matrix.data());
-  glDisable(GL_DEPTH);
-  glDepthMask(0x00);
   scene.DrawPose();
-  glEnable(GL_DEPTH);
-  glDepthMask(0xff);
   pose_prog_->UnBind();
   glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 }

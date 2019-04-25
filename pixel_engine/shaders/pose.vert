@@ -12,5 +12,6 @@ out vec3 v_color;
 
 void main() {
     gl_Position = u_view * vec4(a_pos * .8f, 1);
+    gl_Position.z = -gl_Position.z;
     v_color = a_color;
 }

@@ -109,24 +109,21 @@ void Game::Run() {
     ImGui::NewFrame();
 
     // Run implemented game loop
-    Loop();
-
     auto now = std::chrono::system_clock::now();
     auto time_spent = now - time;
+    Update(std::chrono::duration_cast<
+               std::chrono::duration<float, std::ratio<1, 1>>>(time_spent)
+               .count());
     time = now;
-    double fps =
-        1 / std::chrono::duration_cast<
-                std::chrono::duration<double, std::ratio<1, 1>>>(time_spent)
-                .count();
-    boost::format fps_format("%lf fps");
-    fps_format % ImGui::GetIO().Framerate;
 
+    // Show fps
+    boost::format fps_format("%.02lf fps");
+    fps_format % ImGui::GetIO().Framerate;
     ImVec2 fps_location =
         ImVec2(State.window_width -
                    ImGui::CalcTextSize(fps_format.str().c_str()).x,
                0) +
         ImVec2(-10, 10);
-
     ImGui::GetOverlayDrawList()->AddText(fps_location, IM_COL32_WHITE,
                                          fps_format.str().c_str());
 

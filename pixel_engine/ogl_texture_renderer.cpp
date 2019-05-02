@@ -33,8 +33,7 @@ void OglTextureRenderer::RenderTexture(const OglTexture2d& texture) {
 
 void OglTextureRenderer::Init() {
   prog_ = std::make_shared<Program>(
-      boost::filesystem::path(__FILE__).parent_path() / "shaders" /
-          "texture.vert",
+      boost::filesystem::path(__FILE__).parent_path() / "shaders" / "post.vert",
       boost::filesystem::path(__FILE__).parent_path() / "shaders" /
           "texture.frag");
 

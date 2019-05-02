@@ -74,7 +74,7 @@ void Scene::Bind() {
 
 void Scene::DrawGrid() const {
   glBindVertexArray(grid_vao_);
-  glLineWidth(2);
+  glLineWidth(1);
   glDrawArrays(GL_LINES, 0, (kGridSize * 2 + 1) * 4);
   glBindVertexArray(0);
 }

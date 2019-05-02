@@ -6,8 +6,8 @@
 namespace pxl {
 class PointLight : public Entity {
  public:
-  PointLight(const Color& color, float linear_attenuation = .14,
-             float quadratic_attenuation = .07);
+  PointLight(const Color& color, float linear_attenuation = .7,
+             float quadratic_attenuation = 1.8);
   Color color;
   float linear_attenuation;
   float quadratic_attenuation;

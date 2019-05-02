@@ -31,7 +31,7 @@ vec3 compute_point_light(PointLight light) {
     float dist = length(light.pos - v_pos);
     float attenuation = 1 / (1 + light.linear_attenuation * dist + light.quadratic_attenuation * dist * dist);
 
-    return light.color * .95 * diffuse * attenuation + light.color * .05;
+    return light.color * diffuse * attenuation;
 }
 
 void main() {

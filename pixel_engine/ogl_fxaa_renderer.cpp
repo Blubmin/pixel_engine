@@ -39,7 +39,7 @@ void OglFxaaRenderer::RenderTexture(const OglTexture2d& in_texture) {
 
 void OglFxaaRenderer::Init() {
   prog_ = std::make_shared<Program>(
-      boost::filesystem::path(__FILE__).parent_path() / "shaders" / "fxaa.vert",
+      boost::filesystem::path(__FILE__).parent_path() / "shaders" / "post.vert",
       boost::filesystem::path(__FILE__).parent_path() / "shaders" /
           "fxaa.frag");
   // prog_ = std::make_shared<Program>(

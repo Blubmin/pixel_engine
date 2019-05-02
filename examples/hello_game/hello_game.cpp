@@ -10,6 +10,7 @@
 #include <pixel_engine/mesh_loader.h>
 #include <pixel_engine/ogl_framebuffer.h>
 #include <pixel_engine/ogl_fxaa_renderer.h>
+#include <pixel_engine/ogl_gamma_renderer.h>
 #include <pixel_engine/ogl_mesh.h>
 #include <pixel_engine/ogl_texture_renderer.h>
 #include <pixel_engine/point_light.h>
@@ -48,6 +49,7 @@ class HelloGame : public pxl::Game {
 
     ground = pxl::MeshLoader::LoadMesh<pxl::OglMesh>(GetMeshPath("plane.obj"));
     ground->Bind();
+    ground->position -= Eigen::Vector3f(0.f, 0.01f, 0.f);
     ground->scale = Eigen::Vector3f(10.f, 10.f, 10.f);
     ground->rotation.x() = -90;
 
@@ -58,8 +60,11 @@ class HelloGame : public pxl::Game {
     camera->position += Eigen::Vector3f(0, 1, 10);
     camera->AddComponent(std::make_shared<pxl::FreeCameraComponent>());
 
-    framebuffer = std::make_shared<pxl::OglFramebuffer>(1920, 1080);
-    framebuffer->Bind();
+    framebuffers =
+        std::make_pair(std::make_shared<pxl::OglFramebuffer>(1920, 1080),
+                       std::make_shared<pxl::OglFramebuffer>(1920, 1080));
+    framebuffers.first->Bind();
+    framebuffers.second->Bind();
 
     fxaa_output = std::make_shared<pxl::OglTexture2d>(
         1920, 1080, pxl::Texture2d::Format::FLOAT);
@@ -81,8 +86,9 @@ class HelloGame : public pxl::Game {
   }
 
   void Update(float time_elapsed) override {
+    static float gamma = 2.2f;
     scene->Update(time_elapsed);
-    framebuffer->Start();
+    framebuffers.first->Start();
     prog->Bind();
 
     mesh->rotation += Eigen::Vector3f(0, 90 * time_elapsed, 0);
@@ -91,6 +97,7 @@ class HelloGame : public pxl::Game {
       ImGui::DragFloat3("Position", mesh->position.data());
       ImGui::DragFloat3("Rotation", mesh->rotation.data());
       ImGui::DragFloat3("Scale", mesh->scale.data());
+      ImGui::DragFloat("Gamma", &gamma, .01f);
       ImGui::End();
     }
     glUniformMatrix4fv(prog->GetUniformLocation("u_model"), 1, GL_FALSE,
@@ -143,12 +150,20 @@ class HelloGame : public pxl::Game {
     prog->UnBind();
 
     pxl::SceneRenderer::RenderScene(*scene);
-    framebuffer->End();
+    framebuffers.first->End();
 
-    pxl::OglFxaaRenderer::RenderTexture(*framebuffer->GetColorAttachment(0));
+    framebuffers.second->Start();
+    pxl::OglGammaRenderer::GetInstance()->RenderTexture(
+        framebuffers.first->GetColorAttachment(0), gamma);
+    framebuffers.second->End();
+
+    pxl::OglFxaaRenderer::RenderTexture(
+        *framebuffers.second->GetColorAttachment(0));
   }
 
-  std::shared_ptr<pxl::OglFramebuffer> framebuffer;
+  std::pair<std::shared_ptr<pxl::OglFramebuffer>,
+            std::shared_ptr<pxl::OglFramebuffer>>
+      framebuffers;
   std::shared_ptr<pxl::OglTexture2d> fxaa_output;
   std::shared_ptr<pxl::Camera> camera;
   std::shared_ptr<pxl::Scene> scene;

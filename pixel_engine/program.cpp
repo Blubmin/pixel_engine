@@ -170,4 +170,12 @@ void Program::LoadUniforms() {
 void Program::SetUniformMatrix4fv(const std::string& name, const float* data) {
   glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, data);
 }
+
+void Program::SetUniform1f(const std::string& name, float data) {
+  glUniform1f(GetUniformLocation(name), data);
+}
+
+void Program::SetUniform1i(const std::string& name, int data) {
+  glUniform1i(GetUniformLocation(name), data);
+}
 }  // namespace pxl

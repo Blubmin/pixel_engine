@@ -157,7 +157,7 @@ class HelloGame : public pxl::Game {
         framebuffers.first->GetColorAttachment(0), gamma);
     framebuffers.second->End();
 
-    pxl::OglFxaaRenderer::RenderTexture(
+    pxl::OglFxaaRenderer::GetInstance()->RenderTexture(
         *framebuffers.second->GetColorAttachment(0));
   }
 

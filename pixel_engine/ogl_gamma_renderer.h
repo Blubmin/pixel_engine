@@ -9,7 +9,6 @@ class OglGammaRenderer : public OglPostRenderer {
  public:
   OglGammaRenderer();
   static std::shared_ptr<OglGammaRenderer> GetInstance();
-  void OglGammaRenderer::RenderTexture(std::shared_ptr<OglTexture2d> texture,
-                                       float gamma);
+  void RenderTexture(std::shared_ptr<OglTexture2d> texture, float gamma);
 };
 }  // namespace pxl

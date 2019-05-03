@@ -1,5 +1,7 @@
 #pragma once
 
+#include <pixel_engine/ogl_post_renderer.h>
+
 #include <vector>
 
 #include <Eigen/Core>
@@ -8,16 +10,10 @@
 #include <pixel_engine/program.h>
 
 namespace pxl {
-class OglTextureRenderer {
+class OglTextureRenderer : public OglPostRenderer {
  public:
-  static void RenderTexture(const OglTexture2d& texture);
-
- private:
-  static void Init();
-
-  static std::shared_ptr<Program> prog_;
-  static GLuint vao_;
-  static GLuint buffer_;
-  static std::vector<Eigen::Vector2f> positions_;
+  OglTextureRenderer();
+  static std::shared_ptr<OglTextureRenderer> GetInstance();
+  void RenderTexture(const OglTexture2d& texture);
 };
 }  // namespace pxl

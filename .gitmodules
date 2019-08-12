@@ -12,7 +12,7 @@
 	url = https://github.com/assimp/assimp.git
 [submodule "third_party/eigen"]
 	path = third_party/eigen
-	url = git@github.com:eigenteam/eigen-mirror.git
+	url = git@github.com:eigenteam/eigen-git-mirror.git
 [submodule "third_party/boost/filesystem"]
 	path = third_party/boost/filesystem
 	url = https://github.com/boostorg/filesystem.git

@@ -13,7 +13,8 @@ std::shared_ptr<OglTextureRenderer> OglTextureRenderer::GetInstance() {
   return instance;
 }
 
-void OglTextureRenderer::RenderTexture(const OglTexture2d& texture) {
+void OglTextureRenderer::RenderTexture(const OglTexture2d& texture,
+                                       const Eigen::Rectf roi) {
   auto prog = GetProgram();
   if (prog == nullptr) {
     return;
@@ -24,11 +25,14 @@ void OglTextureRenderer::RenderTexture(const OglTexture2d& texture) {
   texture.Use(0);
   prog->SetUniform1i("texture_sampler", 0);
 
-  glDisable(GL_DEPTH);
+  GLint depth_func;
+  glGetIntegerv(GL_DEPTH_FUNC, &depth_func);
+
+  glDepthFunc(GL_ALWAYS);
   glDepthMask(0x00);
-  DrawQuad();
+  DrawQuad(roi);
   glDepthMask(0xff);
-  glEnable(GL_DEPTH);
+  glDepthFunc(depth_func);
 
   prog->UnBind();
 }

@@ -171,6 +171,10 @@ void Program::SetUniformMatrix4fv(const std::string& name, const float* data) {
   glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, data);
 }
 
+void Program::SetUniform4fv(const std::string& name, const float* data) {
+  glUniform4fv(GetUniformLocation(name), 1, data);
+}
+
 void Program::SetUniform3fv(const std::string& name, const float* data) {
   glUniform3fv(GetUniformLocation(name), 1, data);
 }

@@ -21,6 +21,7 @@ class Program {
   GLint GetUniformLocation(const std::string& name);
 
   void SetUniformMatrix4fv(const std::string& name, const float* data);
+  void SetUniform4fv(const std::string& name, const float* data);
   void SetUniform3fv(const std::string& name, const float* data);
   void SetUniform1f(const std::string& name, float data);
   void SetUniform1i(const std::string& name, int data);

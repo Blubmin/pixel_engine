@@ -2,6 +2,7 @@
 
 #include <GL/gl3w.h>
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 
 namespace pxl {
 namespace {
@@ -26,10 +27,14 @@ void OglPostRenderer::InitProg(const boost::filesystem::path& frag_shader) {
 
 std::shared_ptr<Program> OglPostRenderer::GetProgram() const { return prog_; }
 
-void OglPostRenderer::DrawQuad() {
+void OglPostRenderer::DrawQuad(const Eigen::Rectf roi) {
   if (vao_ == 0) {
     InitQuad();
   }
+  auto min = roi.corner(Eigen::Rectf::BottomLeft) * 2 - Eigen::Vector2f::Ones();
+  auto max = roi.corner(Eigen::Rectf::TopRight) * 2 - Eigen::Vector2f::Ones();
+  Eigen::Vector4f rect(min.x(), min.y(), max.x(), max.y());
+  prog_->SetUniform4fv("roi", rect.data());
   glBindVertexArray(vao_);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);

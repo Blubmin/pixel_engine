@@ -29,6 +29,7 @@ list(APPEND HEADER_FILES
   camera.h
   color.h
   component.h
+  eigen_typedefs.h
   empty.h
   entity.h
   free_camera_component.h

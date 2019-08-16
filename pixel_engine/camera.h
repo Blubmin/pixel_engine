@@ -3,11 +3,13 @@
 #include <Eigen/Core>
 
 #include <pixel_engine/entity.h>
+#include <pixel_engine/mesh.h>
 
 namespace pxl {
 class Camera : public Entity {
  public:
   Camera();
+  void Draw();
 
   float fov;
   float near_plane;
@@ -15,5 +17,8 @@ class Camera : public Entity {
 
   Eigen::Matrix4f GetPerspective();
   Eigen::Matrix4f GetView();
+
+ private:
+  static std::shared_ptr<Mesh> mesh_;
 };
 }  // namespace pxl

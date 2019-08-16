@@ -51,6 +51,7 @@ void SceneRenderer::RenderScene(const Scene& scene) {
 void SceneRenderer::RenderMeshes(const Scene& scene) {
   auto point_lights = scene.GetEntities<PointLight>();
   auto meshes = scene.GetEntities<OglMesh>();
+  auto cameras = scene.GetEntities<Camera>();
 
   mesh_prog_->Bind();
 
@@ -79,6 +80,14 @@ void SceneRenderer::RenderMeshes(const Scene& scene) {
   for (auto mesh : meshes) {
     mesh_prog_->SetUniformMatrix4fv("u_model", mesh->GetTransform().data());
     mesh->Draw();
+  }
+
+  for (auto camera : cameras) {
+    if (scene.camera == camera) {
+      continue;
+    }
+    mesh_prog_->SetUniformMatrix4fv("u_model", camera->GetTransform().data());
+    camera->Draw();
   }
   mesh_prog_->UnBind();
 }

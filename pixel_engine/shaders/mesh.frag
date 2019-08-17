@@ -26,7 +26,7 @@ vec3 view_vec;
 vec3 compute_point_light(PointLight light) {
     vec3 light_vec = normalize(light.pos - v_pos);
     vec3 half_vec = normalize(light_vec + view_vec);
-    float diffuse = max(dot(half_vec, normal_vec), 0);
+    float diffuse = max(dot(light_vec, normal_vec), 0);
 
     float dist = length(light.pos - v_pos);
     float attenuation = 1 / (1 + light.linear_attenuation * dist + light.quadratic_attenuation * dist * dist);
@@ -34,11 +34,18 @@ vec3 compute_point_light(PointLight light) {
     return light.color * diffuse * attenuation;
 }
 
+vec3 compute_directional_light() {
+    vec3 light_vec = -normalize(vec3(1, -1, 1));
+    float diffuse = max(dot(light_vec, normal_vec), 0);
+    return vec3(.03, .03, .03) * diffuse;
+}
+
 void main() {
     normal_vec = normalize(v_normal);
     view_vec = normalize(u_camera_pos - v_pos);
-    f_color = vec3(0, 0, 0);
+    f_color = vec3(0.0, .0, .0);
     for (int i = 0; i < u_num_point_lights; ++i) {
         f_color += compute_point_light(u_point_lights[i]);
     }
+    f_color += compute_directional_light();
 }

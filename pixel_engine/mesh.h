@@ -18,6 +18,8 @@ class SubMesh {
 
 class Mesh : public Entity {
  public:
+  Mesh() {}
+  explicit Mesh(std::shared_ptr<SubMesh> sub_mesh);
   virtual ~Mesh() {}
   virtual void Bind() {}
   virtual void Draw() {}

@@ -2,6 +2,10 @@
 #include <pixel_engine/ogl_mesh.h>
 
 namespace pxl {
+OglMesh::OglMesh() {}
+
+OglMesh::OglMesh(std::shared_ptr<SubMesh> sub_mesh) : Mesh(sub_mesh) {}
+
 OglMesh::~OglMesh() {
   if (!vaos.empty()) {
     glDeleteVertexArrays(vaos.size(), vaos.data());

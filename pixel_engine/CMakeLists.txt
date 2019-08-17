@@ -21,6 +21,7 @@ list(APPEND SOURCE_FILES
   point_light.cpp
   scene.cpp
   scene_renderer.cpp
+  sphere.cpp
   texture2d.cpp
   utilities.cpp
 )
@@ -49,6 +50,7 @@ list(APPEND HEADER_FILES
   point_light.h
   scene.h
   scene_renderer.h
+  sphere.h
   texture2d.h
   utilities.h
 )

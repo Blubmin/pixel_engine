@@ -76,7 +76,6 @@ void SceneRenderer::RenderMeshes(const Scene& scene) {
     mesh_prog_->SetUniform1f(array_format.str() + "quadratic_attenuation",
                              point_light->quadratic_attenuation);
   }
-
   for (auto mesh : meshes) {
     mesh_prog_->SetUniformMatrix4fv("u_model", mesh->GetTransform().data());
     mesh->Draw();

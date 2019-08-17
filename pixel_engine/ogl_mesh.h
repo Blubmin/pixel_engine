@@ -6,6 +6,8 @@
 namespace pxl {
 class OglMesh : public Mesh {
  public:
+  OglMesh();
+  explicit OglMesh(std::shared_ptr<SubMesh> sub_mesh);
   ~OglMesh() override;
   void Bind() override;
   void Draw() override;

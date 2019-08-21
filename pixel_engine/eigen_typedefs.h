@@ -14,4 +14,7 @@ using Vector4 = Matrix<T, 4, 1>;
 
 template <typename T>
 using Isometry3 = Transform<T, 3, Isometry>;
+
+template <typename T>
+using Matrix3 = Matrix<T, 3, 3>;
 }  // namespace Eigen

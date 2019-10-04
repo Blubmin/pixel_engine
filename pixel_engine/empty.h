@@ -1,3 +1,5 @@
+#pragma once
+
 #include <pixel_engine/entity.h>
 
 namespace pxl {

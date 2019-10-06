@@ -78,7 +78,7 @@ void Program::Bind() { glUseProgram(prog_id_); }
 
 void Program::UnBind() { glUseProgram(0); }
 
-GLint Program::GetAttributeLocation(const std::string& name) {
+GLint Program::GetAttributeLocation(const std::string& name) const {
   if (attributes_.count(name) != 1) {
     LOG(WARNING) << "No active attribute found with name " << name;
     return -1;
@@ -86,7 +86,7 @@ GLint Program::GetAttributeLocation(const std::string& name) {
   return attributes_.at(name);
 }
 
-GLint Program::GetUniformLocation(const std::string& name) {
+GLint Program::GetUniformLocation(const std::string& name) const {
   if (uniforms_.count(name) != 1) {
     LOG(WARNING) << "No active uniform found with name " << name;
     return -1;
@@ -167,23 +167,24 @@ void Program::LoadUniforms() {
   }
 }
 
-void Program::SetUniformMatrix4fv(const std::string& name, const float* data) {
+void Program::SetUniformMatrix4fv(const std::string& name,
+                                  const float* data) const {
   glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, data);
 }
 
-void Program::SetUniform4fv(const std::string& name, const float* data) {
+void Program::SetUniform4fv(const std::string& name, const float* data) const {
   glUniform4fv(GetUniformLocation(name), 1, data);
 }
 
-void Program::SetUniform3fv(const std::string& name, const float* data) {
+void Program::SetUniform3fv(const std::string& name, const float* data) const {
   glUniform3fv(GetUniformLocation(name), 1, data);
 }
 
-void Program::SetUniform1f(const std::string& name, float data) {
+void Program::SetUniform1f(const std::string& name, float data) const {
   glUniform1f(GetUniformLocation(name), data);
 }
 
-void Program::SetUniform1i(const std::string& name, int data) {
+void Program::SetUniform1i(const std::string& name, int data) const {
   glUniform1i(GetUniformLocation(name), data);
 }
 }  // namespace pxl

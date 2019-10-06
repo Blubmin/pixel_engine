@@ -7,13 +7,15 @@ list(APPEND SOURCE_FILES
   free_camera_component.cpp
   game_mode.cpp
   game.cpp
+  material.cpp
   mesh_loader.cpp
   mesh.cpp
   ogl_framebuffer.cpp
   ogl_fxaa_renderer.cpp
   ogl_gamma_renderer.cpp
-  ogl_post_renderer.cpp
+  ogl_material.cpp
   ogl_mesh.cpp
+  ogl_post_renderer.cpp
   ogl_texture2d.cpp
   ogl_texture_renderer.cpp
   ogl_utilities.cpp
@@ -36,13 +38,15 @@ list(APPEND HEADER_FILES
   free_camera_component.h
   game_mode.h
   game.h
+  material.h
   mesh_loader.h
   mesh.h
   ogl_framebuffer.h
   ogl_fxaa_renderer.h
   ogl_gamma_renderer.h
-  ogl_post_renderer.h
+  ogl_material.h
   ogl_mesh.h
+  ogl_post_renderer.h
   ogl_texture2d.h
   ogl_texture_renderer.h
   ogl_utilities.h

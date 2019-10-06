@@ -17,14 +17,14 @@ class Program {
   void Bind();
   void UnBind();
 
-  GLint GetAttributeLocation(const std::string& name);
-  GLint GetUniformLocation(const std::string& name);
+  GLint GetAttributeLocation(const std::string& name) const;
+  GLint GetUniformLocation(const std::string& name) const;
 
-  void SetUniformMatrix4fv(const std::string& name, const float* data);
-  void SetUniform4fv(const std::string& name, const float* data);
-  void SetUniform3fv(const std::string& name, const float* data);
-  void SetUniform1f(const std::string& name, float data);
-  void SetUniform1i(const std::string& name, int data);
+  void SetUniformMatrix4fv(const std::string& name, const float* data) const;
+  void SetUniform4fv(const std::string& name, const float* data) const;
+  void SetUniform3fv(const std::string& name, const float* data) const;
+  void SetUniform1f(const std::string& name, float data) const;
+  void SetUniform1i(const std::string& name, int data) const;
 
  private:
   GLuint prog_id_;

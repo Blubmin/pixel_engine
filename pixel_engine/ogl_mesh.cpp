@@ -1,5 +1,8 @@
-#include <glog/logging.h>
 #include <pixel_engine/ogl_mesh.h>
+
+#include <glog/logging.h>
+
+#include <pixel_engine/program.h>
 
 namespace pxl {
 OglMesh::OglMesh() {}
@@ -57,11 +60,23 @@ void OglMesh::Bind() {
     // Cleanup
     glBindVertexArray(0);
   }
+
+  // Replace materials with Ogl counterpart
+  for (auto& material : materials) {
+    auto ogl_material = std::make_shared<OglMaterial>(*material);
+    ogl_material->Bind();
+    material = ogl_material;
+  }
 }
 
-void OglMesh::Draw() {
+void OglMesh::Draw(const Program& prog) {
   for (size_t i = 0; i < sub_meshes.size(); ++i) {
     const auto sub_mesh = sub_meshes[i];
+
+    const auto material = std::dynamic_pointer_cast<OglMaterial>(
+        materials[sub_mesh->material_idx]);
+    material->Use(prog);
+
     glBindVertexArray(vaos[i]);
     glDrawElements(GL_TRIANGLES, sub_mesh->triangles.size(), GL_UNSIGNED_INT,
                    0);

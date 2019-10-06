@@ -94,9 +94,9 @@
 [submodule "third_party/boost/typeof"]
 	path = third_party/boost/typeof
 	url = https://github.com/boostorg/typeof.git
-[submodule "third_party/CImg"]
-	path = third_party/CImg
-	url = https://github.com/dtschump/CImg.git
 [submodule "third_party/imgui"]
 	path = third_party/imgui
 	url = git@github.com:Blubmin/imgui.git
+[submodule "third_party/stb"]
+	path = third_party/stb
+	url = https://github.com/nothings/stb.git

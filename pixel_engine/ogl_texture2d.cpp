@@ -6,13 +6,26 @@
 
 namespace pxl {
 namespace {
-GLenum GetInternalFormat(Texture2d::Format format) {
-  switch (format) {
+GLenum GetInternalFormat(const Texture2d& texture) {
+  int32_t channels = texture.GetChannels();
+  switch (texture.GetFormat()) {
     case (Texture2d::Format::BYTE):
-      return GL_RGBA;
+      if (channels == 1) {
+        return GL_RED;
+      } else if (channels == 3) {
+        return GL_RGB;
+      } else if (channels == 4) {
+        return GL_RGBA;
+      }
       break;
     case (Texture2d::Format::FLOAT):
-      return GL_RGBA32F;
+      if (channels == 1) {
+        return GL_R32F;
+      } else if (channels == 3) {
+        return GL_RGB32F;
+      } else if (channels == 4) {
+        return GL_RGBA32F;
+      }
       break;
     case (Texture2d::Format::DEPTH_STENCIL):
       return GL_DEPTH24_STENCIL8;
@@ -22,13 +35,26 @@ GLenum GetInternalFormat(Texture2d::Format format) {
   }
 }
 
-GLenum GetDataFormat(Texture2d::Format format) {
-  switch (format) {
+GLenum GetDataFormat(const Texture2d texture) {
+  int32_t channels = texture.GetChannels();
+  switch (texture.GetFormat()) {
     case (Texture2d::Format::BYTE):
-      return GL_RGBA;
+      if (channels == 1) {
+        return GL_RED;
+      } else if (channels == 3) {
+        return GL_RGB;
+      } else if (channels == 4) {
+        return GL_RGBA;
+      }
       break;
     case (Texture2d::Format::FLOAT):
-      return GL_RGBA;
+      if (channels == 1) {
+        return GL_RED;
+      } else if (channels == 3) {
+        return GL_RGB;
+      } else if (channels == 4) {
+        return GL_RGBA;
+      }
       break;
     case (Texture2d::Format::DEPTH_STENCIL):
       return GL_DEPTH_STENCIL;
@@ -54,9 +80,16 @@ GLenum GetDataType(Texture2d::Format format) {
   }
 }
 }  // namespace
-OglTexture2d::OglTexture2d(uint32_t width, uint32_t height,
+OglTexture2d::OglTexture2d(int32_t width, int32_t height,
                            Texture2d::Format format)
     : Texture2d(width, height, format) {}
+
+OglTexture2d::OglTexture2d(float* data, int32_t width, int32_t height,
+                           int32_t channels)
+    : Texture2d(data, width, height, channels) {}
+
+OglTexture2d::OglTexture2d(const boost::filesystem::path& path)
+    : Texture2d(path) {}
 
 OglTexture2d::~OglTexture2d() { glDeleteTextures(1, &texture_id); }
 
@@ -66,8 +99,8 @@ void OglTexture2d::Bind() {
   glBindTexture(GL_TEXTURE_2D, texture_id);
 
   // Set data
-  glTexImage2D(GL_TEXTURE_2D, 0, GetInternalFormat(format), width, height, 0,
-               GetDataFormat(format), GetDataType(format), 0);
+  glTexImage2D(GL_TEXTURE_2D, 0, GetInternalFormat(*this), width, height, 0,
+               GetDataFormat(*this), GetDataType(format), image_data);
 
   // Set parameters
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

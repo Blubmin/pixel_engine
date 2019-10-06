@@ -78,7 +78,7 @@ void SceneRenderer::RenderMeshes(const Scene& scene) {
   }
   for (auto mesh : meshes) {
     mesh_prog_->SetUniformMatrix4fv("u_model", mesh->GetTransform().data());
-    mesh->Draw();
+    mesh->Draw(*mesh_prog_);
   }
 
   for (auto camera : cameras) {
@@ -86,7 +86,7 @@ void SceneRenderer::RenderMeshes(const Scene& scene) {
       continue;
     }
     mesh_prog_->SetUniformMatrix4fv("u_model", camera->GetTransform().data());
-    camera->Draw();
+    camera->Draw(*mesh_prog_);
   }
   mesh_prog_->UnBind();
 }

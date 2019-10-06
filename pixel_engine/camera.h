@@ -4,12 +4,13 @@
 
 #include <pixel_engine/entity.h>
 #include <pixel_engine/mesh.h>
+#include <pixel_engine/program.h>
 
 namespace pxl {
 class Camera : public Entity {
  public:
   Camera();
-  void Draw();
+  void Draw(const Program& prog);
 
   float fov;
   float near_plane;

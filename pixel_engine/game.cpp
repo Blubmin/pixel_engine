@@ -57,7 +57,7 @@ Game::Game(const std::string &game_name) {
 
   /** Init OpenGL Defaults **/
   glfwSwapInterval(1);
-  glClearColor(.2f, .2f, .2f, 1.f);
+  glClearColor(.15f, .15f, .15f, 1.f);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA,
@@ -94,7 +94,7 @@ Game::~Game() {}
 
 void Game::Run() {
   Init();
-  glClearColor(.2, .2, .2, 1);
+  glClearColor(.15, .15, .15, 1);
 
   auto time = std::chrono::system_clock::now();
 

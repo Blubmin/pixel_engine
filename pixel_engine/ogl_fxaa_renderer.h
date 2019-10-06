@@ -5,7 +5,6 @@
 #include <Eigen/Core>
 
 #include <pixel_engine/ogl_texture2d.h>
-#include <pixel_engine/program.h>
 
 namespace pxl {
 class OglFxaaRenderer : public OglPostRenderer {

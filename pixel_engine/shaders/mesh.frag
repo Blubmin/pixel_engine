@@ -3,6 +3,7 @@
 // Input
 in vec3 v_normal;
 in vec3 v_pos;
+in vec2 v_uv;
 
 // Uniforms
 struct PointLight {
@@ -15,6 +16,15 @@ uniform vec3 u_camera_pos;
 uniform int u_num_point_lights;
 uniform PointLight[8] u_point_lights;
 
+struct Material {
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float shininess;
+	sampler2D diffuse_texture;
+};
+uniform Material u_material;
+
 // Output
 out vec3 f_color;
 
@@ -26,18 +36,19 @@ vec3 view_vec;
 vec3 compute_point_light(PointLight light) {
     vec3 light_vec = normalize(light.pos - v_pos);
     vec3 half_vec = normalize(light_vec + view_vec);
-    float diffuse = max(dot(light_vec, normal_vec), 0);
+    vec3 diffuse = max(dot(light_vec, normal_vec), 0) * (u_material.diffuse + texture2D(u_material.diffuse_texture, v_uv).xyz);
+	vec3 specular = pow(max(dot(half_vec, normal_vec), 0), u_material.shininess) * u_material.specular;
 
     float dist = length(light.pos - v_pos);
     float attenuation = 1 / (1 + light.linear_attenuation * dist + light.quadratic_attenuation * dist * dist);
 
-    return light.color * diffuse * attenuation;
+    return (u_material.ambient * .005 + diffuse + specular) * attenuation * light.color;
 }
 
 vec3 compute_directional_light() {
     vec3 light_vec = -normalize(vec3(1, -1, 1));
     float diffuse = max(dot(light_vec, normal_vec), 0);
-    return vec3(.03, .03, .03) * diffuse;
+    return vec3(.003, .003, .003) * diffuse;
 }
 
 void main() {

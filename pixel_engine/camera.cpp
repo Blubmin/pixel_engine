@@ -14,7 +14,7 @@ std::shared_ptr<Mesh> Camera::mesh_(nullptr);
 
 Camera::Camera() : fov(90.f), near_plane(0.01f), far_plane(1000.f) {}
 
-void Camera::Draw() {
+void Camera::Draw(const Program& prog) {
   if (mesh_ == nullptr) {
     mesh_ = MeshLoader::LoadMesh<OglMesh>(
         (boost::filesystem::path(__FILE__).parent_path() / "meshes" / "camera" /
@@ -22,7 +22,7 @@ void Camera::Draw() {
     CHECK(mesh_ != nullptr);
     mesh_->Bind();
   }
-  mesh_->Draw();
+  mesh_->Draw(prog);
 }
 
 Eigen::Matrix4f Camera::GetPerspective() {

@@ -46,10 +46,17 @@ class MeshLoader {
     }
   }
 
+  static std::map<boost::filesystem::path, std::shared_ptr<Mesh>>
+      loaded_meshes_;
+
  public:
   template <typename MeshType>
   static std::shared_ptr<MeshType> LoadMesh(
       const boost::filesystem::path &path) {
+    if (loaded_meshes_.count(path) != 0) {
+      return std::dynamic_pointer_cast<MeshType>(loaded_meshes_[path]);
+    }
+
     Assimp::Importer importer;
 
     uint32_t read_flags = aiProcess_JoinIdenticalVertices |
@@ -68,7 +75,15 @@ class MeshLoader {
 
     std::shared_ptr<MeshType> mesh = ParseScene<MeshType>(ai_scene);
     FixMaterialPaths(mesh, path);
-    return std::move(mesh);
+    loaded_meshes_[path] = mesh;
+    return mesh;
+  }
+
+  template <typename MeshType>
+  static std::shared_ptr<MeshEntity> LoadMeshEntity(
+      const boost::filesystem::path &path) {
+    auto entity = std::make_shared<MeshEntity>(LoadMesh<MeshType>(path));
+    return std::move(entity);
   }
 };  // namespace pxl
 }  // namespace pxl

@@ -5,9 +5,10 @@
 #include <pixel_engine/program.h>
 
 namespace pxl {
-OglMesh::OglMesh() {}
+OglMesh::OglMesh() : is_bound_(false) {}
 
-OglMesh::OglMesh(std::shared_ptr<SubMesh> sub_mesh) : Mesh(sub_mesh) {}
+OglMesh::OglMesh(std::shared_ptr<SubMesh> sub_mesh)
+    : Mesh(sub_mesh), is_bound_(false) {}
 
 OglMesh::~OglMesh() {
   if (!vaos.empty()) {
@@ -19,6 +20,9 @@ OglMesh::~OglMesh() {
 }
 
 void OglMesh::Bind() {
+  if (is_bound_) {
+    return;
+  }
   vaos.resize(sub_meshes.size(), -1);
   buffers.resize(sub_meshes.size(), std::vector<GLuint>(4));
   glGenVertexArrays(vaos.size(), vaos.data());
@@ -67,6 +71,8 @@ void OglMesh::Bind() {
     ogl_material->Bind();
     material = ogl_material;
   }
+
+  is_bound_ = true;
 }
 
 void OglMesh::Draw(const Program& prog) {

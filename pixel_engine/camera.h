@@ -20,6 +20,6 @@ class Camera : public Entity {
   Eigen::Matrix4f GetView();
 
  private:
-  static std::shared_ptr<Mesh> mesh_;
+  static std::shared_ptr<MeshEntity> mesh_;
 };
 }  // namespace pxl

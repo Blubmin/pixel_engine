@@ -19,15 +19,24 @@ class SubMesh {
   uint32_t material_idx;
 };
 
-class Mesh : public Entity {
+class Mesh : public Component {
  public:
   Mesh() {}
   explicit Mesh(std::shared_ptr<SubMesh> sub_mesh);
   virtual ~Mesh() {}
   virtual void Bind() {}
-  virtual void Draw(const Program& prog) {}
+  void Draw(const Program& prog) override {}
 
   std::vector<std::shared_ptr<SubMesh>> sub_meshes;
   std::vector<std::shared_ptr<Material>> materials;
+};
+
+class MeshEntity : public Entity {
+ public:
+  MeshEntity(std::shared_ptr<pxl::Mesh> mesh);
+  void Bind();
+  void Draw(const Program& prog);
+
+  std::shared_ptr<pxl::Mesh> mesh;
 };
 }  // namespace pxl

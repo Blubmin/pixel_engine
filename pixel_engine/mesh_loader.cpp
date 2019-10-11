@@ -3,6 +3,9 @@
 #include <string>
 
 namespace pxl {
+std::map<boost::filesystem::path, std::shared_ptr<Mesh>>
+    MeshLoader::loaded_meshes_;
+
 std::shared_ptr<SubMesh> MeshLoader::ParseMesh(const aiMesh* ai_mesh) {
   SubMesh sub_mesh;
   if (ai_mesh->mPrimitiveTypes != aiPrimitiveType_TRIANGLE) {
@@ -47,19 +50,20 @@ std::shared_ptr<Material> MeshLoader::ParseMaterial(
     const aiMaterial* ai_material) {
   Material material;
 
-  // Ambeint
-  aiColor3D ambient;
-  if (AI_SUCCESS != ai_material->Get(AI_MATKEY_COLOR_AMBIENT, ambient)) {
-    ambient = aiColor3D(0, 0, 0);
-  }
-  material.ambient = Eigen::Vector3f(ambient.r, ambient.g, ambient.b);
-
   // Diffuse
   aiColor3D diffuse;
   if (AI_SUCCESS != ai_material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse)) {
     diffuse = aiColor3D(0, 0, 0);
   }
   material.diffuse = Eigen::Vector3f(diffuse.r, diffuse.g, diffuse.b);
+
+  // Ambeint
+  /*aiColor3D ambient;
+  if (AI_SUCCESS != ai_material->Get(AI_MATKEY_COLOR_AMBIENT, ambient)) {
+    ambient = aiColor3D(0, 0, 0);
+  }
+  material.ambient = Eigen::Vector3f(ambient.r, ambient.g, ambient.b);*/
+  material.ambient = material.diffuse;
 
   // Specular
   aiColor3D specular;

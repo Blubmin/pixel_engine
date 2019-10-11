@@ -23,5 +23,8 @@ class OglMesh : public Mesh {
   GLuint vao;
   std::vector<GLuint> vaos;
   std::vector<std::vector<GLuint>> buffers;
+
+ private:
+  bool is_bound_;
 };
 }  // namespace pxl

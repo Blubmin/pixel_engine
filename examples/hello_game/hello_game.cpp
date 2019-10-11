@@ -36,9 +36,10 @@ class HelloGame : public pxl::Game {
  public:
   HelloGame() : pxl::Game("Hello Game") {}
   void Init() override {
-    mesh = pxl::MeshLoader::LoadMesh<pxl::OglMesh>(GetMeshPath("bunny.obj"));
-    auto child =
-        pxl::MeshLoader::LoadMesh<pxl::OglMesh>(GetMeshPath("sphere.obj"));
+    mesh =
+        pxl::MeshLoader::LoadMeshEntity<pxl::OglMesh>(GetMeshPath("bunny.obj"));
+    auto child = pxl::MeshLoader::LoadMeshEntity<pxl::OglMesh>(
+        GetMeshPath("sphere.obj"));
     child->Bind();
     // child->scale = Eigen::Vector3f(.01f, .01f, .01f);
     child->position = Eigen::Vector3f(1.f, 1.f, 0.f);
@@ -47,12 +48,13 @@ class HelloGame : public pxl::Game {
     // mesh->scale = Eigen::Vector3f(.01, .01, .01);
     mesh->rotation.y() = (M_PI / 2.f);
 
-    auto child_child =
-        pxl::MeshLoader::LoadMesh<pxl::OglMesh>(GetMeshPath("sphere.obj"));
+    auto child_child = pxl::MeshLoader::LoadMeshEntity<pxl::OglMesh>(
+        GetMeshPath("sphere.obj"));
     CHECK(child_child != nullptr);
     // child->AddChild(child_child);
 
-    ground = pxl::MeshLoader::LoadMesh<pxl::OglMesh>(GetMeshPath("plane.obj"));
+    ground =
+        pxl::MeshLoader::LoadMeshEntity<pxl::OglMesh>(GetMeshPath("plane.obj"));
     ground->Bind();
     ground->position -= Eigen::Vector3f(0.f, 0.01f, 0.f);
     ground->scale = Eigen::Vector3f(10.f, 10.f, 10.f);
@@ -143,8 +145,8 @@ class HelloGame : public pxl::Game {
   std::shared_ptr<pxl::OglTexture2d> fxaa_output;
   std::shared_ptr<pxl::Camera> camera;
   std::shared_ptr<pxl::Scene> scene;
-  std::shared_ptr<pxl::OglMesh> mesh;
-  std::shared_ptr<pxl::OglMesh> ground;
+  std::shared_ptr<pxl::MeshEntity> mesh;
+  std::shared_ptr<pxl::MeshEntity> ground;
   std::shared_ptr<pxl::Program> prog;
   std::vector<std::shared_ptr<pxl::PointLight>> point_lights;
 };

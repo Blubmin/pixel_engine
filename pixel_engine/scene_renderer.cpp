@@ -50,7 +50,7 @@ void SceneRenderer::RenderScene(const Scene& scene) {
 
 void SceneRenderer::RenderMeshes(const Scene& scene) {
   auto point_lights = scene.GetEntities<PointLight>();
-  auto meshes = scene.GetEntities<OglMesh>();
+  auto meshes = scene.GetEntities<MeshEntity>();
   auto cameras = scene.GetEntities<Camera>();
 
   mesh_prog_->Bind();

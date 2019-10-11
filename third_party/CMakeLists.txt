@@ -15,6 +15,7 @@ add_subdirectory(gflags)
 
 # glog
 set(WITH_GFLAGS OFF)
+set(BUILD_TESTING OFF)
 add_subdirectory(glog)
 
 # Assimp

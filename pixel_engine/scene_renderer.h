@@ -17,5 +17,6 @@ class SceneRenderer {
   static std::shared_ptr<Program> mesh_prog_;
   static std::shared_ptr<Program> grid_prog_;
   static std::shared_ptr<Program> pose_prog_;
+  static std::shared_ptr<Program> skybox_prog_;
 };
 }  // namespace pxl

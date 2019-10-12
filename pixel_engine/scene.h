@@ -1,9 +1,10 @@
 #pragma once
 
-#include <GL/gl3w.h>>
+#include <GL/gl3w.h>
 
 #include <pixel_engine/camera.h>
 #include <pixel_engine/entity.h>
+#include <pixel_engine/skybox.h>
 
 namespace pxl {
 class Scene {
@@ -16,6 +17,7 @@ class Scene {
 
   std::vector<std::shared_ptr<Entity>> entities;
   std::shared_ptr<Camera> camera;
+  std::shared_ptr<Skybox> skybox;
 
   template <typename EntityType>
   std::vector<std::shared_ptr<EntityType>> GetEntities() const {

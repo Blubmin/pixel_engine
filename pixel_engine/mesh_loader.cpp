@@ -86,6 +86,7 @@ std::shared_ptr<Material> MeshLoader::ParseMaterial(
       diffuse_texture_path.length != 0) {
     material.diffuse_texture_path =
         boost::filesystem::path(diffuse_texture_path.data);
+    material.diffuse = Eigen::Vector3f::Zero();
   }
 
   return std::move(std::make_shared<Material>(material));

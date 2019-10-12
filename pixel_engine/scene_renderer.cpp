@@ -14,6 +14,8 @@ std::shared_ptr<Program> SceneRenderer::grid_prog_(nullptr);
 
 std::shared_ptr<Program> SceneRenderer::pose_prog_(nullptr);
 
+std::shared_ptr<Program> SceneRenderer::skybox_prog_(nullptr);
+
 void SceneRenderer::RenderScene(const Scene& scene) {
   if (grid_prog_ == nullptr) {
     Init();
@@ -88,7 +90,23 @@ void SceneRenderer::RenderMeshes(const Scene& scene) {
     mesh_prog_->SetUniformMatrix4fv("u_model", camera->GetTransform().data());
     camera->Draw(*mesh_prog_);
   }
+
   mesh_prog_->UnBind();
+
+  skybox_prog_->Bind();
+  if (scene.skybox != nullptr) {
+    scene.skybox->position = scene.camera->position;
+    scene.skybox->scale = Eigen::Vector3f::Ones() *
+                          (scene.camera->far_plane - FLT_EPSILON) /
+                          std::sqrt(3);
+    skybox_prog_->SetUniformMatrix4fv("u_perspective",
+                                      scene.camera->GetPerspective().data());
+    skybox_prog_->SetUniformMatrix4fv("u_view", scene.camera->GetView().data());
+    skybox_prog_->SetUniformMatrix4fv("u_model",
+                                      scene.skybox->GetTransform().data());
+    scene.skybox->mesh->Draw(*skybox_prog_);
+  }
+  skybox_prog_->UnBind();
 }
 
 void SceneRenderer::Init() {
@@ -104,5 +122,10 @@ void SceneRenderer::Init() {
       boost::filesystem::path(__FILE__).parent_path() / "shaders" / "pose.vert",
       boost::filesystem::path(__FILE__).parent_path() / "shaders" /
           "pose.frag");
+  skybox_prog_ = std::make_shared<Program>(
+      boost::filesystem::path(__FILE__).parent_path() / "shaders" /
+          "skybox.vert",
+      boost::filesystem::path(__FILE__).parent_path() / "shaders" /
+          "skybox.frag");
 }
 }  // namespace pxl

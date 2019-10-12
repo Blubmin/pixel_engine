@@ -3,6 +3,7 @@
 #include <glog/logging.h>
 #include <boost/format.hpp>
 
+#include <pixel_engine/directional_light.h>
 #include <pixel_engine/ogl_mesh.h>
 #include <pixel_engine/point_light.h>
 #include <pixel_engine/utilities.h>
@@ -16,7 +17,7 @@ std::shared_ptr<Program> SceneRenderer::pose_prog_(nullptr);
 
 std::shared_ptr<Program> SceneRenderer::skybox_prog_(nullptr);
 
-void SceneRenderer::RenderScene(const Scene& scene) {
+void SceneRenderer::RenderScene(const Scene& scene, float gamma) {
   if (grid_prog_ == nullptr) {
     Init();
   }
@@ -27,7 +28,7 @@ void SceneRenderer::RenderScene(const Scene& scene) {
   }
 
   // Draw meshes
-  RenderMeshes(scene);
+  RenderMeshes(scene, gamma);
 
   // Draw grid
   grid_prog_->Bind();
@@ -50,20 +51,22 @@ void SceneRenderer::RenderScene(const Scene& scene) {
   glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 
-void SceneRenderer::RenderMeshes(const Scene& scene) {
+void SceneRenderer::RenderMeshes(const Scene& scene, float gamma) {
   auto point_lights = scene.GetEntities<PointLight>();
+  auto dir_lights = scene.GetEntities<DirectionalLight>();
   auto meshes = scene.GetEntities<MeshEntity>();
   auto cameras = scene.GetEntities<Camera>();
 
   mesh_prog_->Bind();
 
+  mesh_prog_->SetUniform1f("u_gamma", gamma);
   mesh_prog_->SetUniformMatrix4fv("u_view", scene.camera->GetView().data());
   mesh_prog_->SetUniformMatrix4fv("u_perspective",
                                   scene.camera->GetPerspective().data());
-
   mesh_prog_->SetUniform3fv("u_camera_pos", scene.camera->position.data());
-
   mesh_prog_->SetUniform1i("u_num_point_lights", point_lights.size());
+
+  // Point lights
   for (size_t i = 0; i < point_lights.size(); ++i) {
     auto point_light = point_lights.at(i);
     boost::format array_format("u_point_lights[%u].");
@@ -78,11 +81,25 @@ void SceneRenderer::RenderMeshes(const Scene& scene) {
     mesh_prog_->SetUniform1f(array_format.str() + "quadratic_attenuation",
                              point_light->quadratic_attenuation);
   }
+
+  // Only supports one directional light at the moment;
+  if (!dir_lights.empty()) {
+    auto dir_light = dir_lights[0];
+    mesh_prog_->SetUniform3fv("u_dir_light.direction",
+                              dir_light->direction.data());
+    mesh_prog_->SetUniform1f("u_dir_light.strength", dir_light->strength);
+    mesh_prog_->SetUniform3fv("u_dir_light.color", dir_light->color.data());
+  } else {
+    mesh_prog_->SetUniform1f("u_dir_light.strength", 0);
+  }
+
+  // Draw Meshes
   for (auto mesh : meshes) {
     mesh_prog_->SetUniformMatrix4fv("u_model", mesh->GetTransform().data());
     mesh->Draw(*mesh_prog_);
   }
 
+  // Draw Camera Meshes
   for (auto camera : cameras) {
     if (scene.camera == camera) {
       continue;
@@ -93,6 +110,7 @@ void SceneRenderer::RenderMeshes(const Scene& scene) {
 
   mesh_prog_->UnBind();
 
+  // Draw skybox
   skybox_prog_->Bind();
   if (scene.skybox != nullptr) {
     scene.skybox->position = scene.camera->position;

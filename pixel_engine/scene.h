@@ -32,6 +32,18 @@ class Scene {
     return entities_by_type;
   }
 
+  template <typename EntityType>
+  std::shared_ptr<EntityType> GetEntity() const {
+    for (auto entity : entities) {
+      std::shared_ptr<EntityType> typed_entity =
+          std::dynamic_pointer_cast<EntityType>(entity);
+      if (typed_entity != nullptr) {
+        return typed_entity;
+      }
+    }
+    return nullptr;
+  }
+
  private:
   GLuint grid_vao_;
   GLuint grid_buffer_;

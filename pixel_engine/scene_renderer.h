@@ -8,10 +8,10 @@
 namespace pxl {
 class SceneRenderer {
  public:
-  static void RenderScene(const Scene& scene);
+  static void RenderScene(const Scene& scene, float gamma = 2.2f);
 
  private:
-  static void RenderMeshes(const Scene& scene);
+  static void RenderMeshes(const Scene& scene, float gamma);
   static void Init();
 
   static std::shared_ptr<Program> mesh_prog_;

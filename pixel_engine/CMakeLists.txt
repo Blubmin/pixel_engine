@@ -2,6 +2,7 @@ list(APPEND SOURCE_FILES
   camera.cpp
   color.cpp
   component.cpp
+  directional_light.cpp
   empty.cpp
   entity.cpp
   free_camera_component.cpp
@@ -33,6 +34,7 @@ list(APPEND HEADER_FILES
   camera.h
   color.h
   component.h
+  directional_light.h
   eigen_typedefs.h
   empty.h
   entity.h

@@ -5,7 +5,7 @@
 namespace pxl {
 class DirectionalLight : public Entity {
  public:
-  DirectionalLight(const Eigen::Vector3f& direction, float strength = .5,
+  DirectionalLight(const Eigen::Vector3f& direction, float strength = 1.0,
                    const Eigen::Vector3f& color = Eigen::Vector3f::Ones());
 
   Eigen::Vector3f direction;

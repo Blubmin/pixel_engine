@@ -35,6 +35,7 @@ class Program {
   std::map<std::string, GLuint> attributes_;
   std::map<std::string, GLuint> uniforms_;
 
+  std::string LoadFile(const boost::filesystem::path& file_path) const;
   GLuint LoadShader(const boost::filesystem::path& shader_path, GLenum shader);
   void LoadAttributes();
   void LoadUniforms();

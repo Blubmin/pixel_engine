@@ -1,6 +1,7 @@
 #include <pixel_engine/program.h>
 
 #include <fstream>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -94,25 +95,40 @@ GLint Program::GetUniformLocation(const std::string& name) const {
   return uniforms_.at(name);
 }
 
-GLuint Program::LoadShader(const boost::filesystem::path& shader_path,
-                           GLenum shader_type) {
+std::string Program::LoadFile(const boost::filesystem::path& file_path) const {
   // Load shader into a string
   std::stringstream shader_code;
   std::ifstream shader_file;
-  shader_file.open(shader_path.native());
+  shader_file.open(file_path.native());
   if (shader_file.is_open()) {
     std::string line;
     while (std::getline(shader_file, line)) {
       shader_code << line << std::endl;
     }
   } else {
-    LOG(ERROR) << "Could not open " << shader_path.string();
-    return 0;
+    LOG(ERROR) << "Could not open " << file_path.string();
+    return "";
+  }
+  return shader_code.str();
+}
+
+GLuint Program::LoadShader(const boost::filesystem::path& shader_path,
+                           GLenum shader_type) {
+  // Load shader into a string
+  std::string shader_code_string = LoadFile(shader_path);
+
+  std::regex include_regex("#include \"(.*)\"\n");
+
+  std::smatch match;
+  while (std::regex_search(shader_code_string, match, include_regex)) {
+    std::string include_string =
+        LoadFile(shader_path.parent_path() / match[1].str());
+    shader_code_string =
+        std::regex_replace(shader_code_string, include_regex, include_string);
   }
 
   // Bind Shader to GPU
   auto shader_id = glCreateShader(shader_type);
-  std::string shader_code_string = shader_code.str();
   const GLchar* data = shader_code_string.data();
   GLint code_size = shader_code_string.size() + 1;
   glShaderSource(shader_id, 1, &data, &code_size);

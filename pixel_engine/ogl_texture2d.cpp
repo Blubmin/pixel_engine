@@ -118,4 +118,9 @@ void OglTexture2d::Use(uint32_t texture_unit) const {
   glActiveTexture(GL_TEXTURE0 + texture_unit);
   glBindTexture(GL_TEXTURE_2D, texture_id);
 }
+
+void OglTexture2d::SetWrapMode(GLenum wrap_mode) const {
+  glTextureParameteri(texture_id, GL_TEXTURE_WRAP_S, wrap_mode);
+  glTextureParameteri(texture_id, GL_TEXTURE_WRAP_T, wrap_mode);
+}
 }  // namespace pxl

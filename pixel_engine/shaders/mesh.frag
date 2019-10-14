@@ -1,18 +1,6 @@
 #version 330
 
-//Classes
-struct PointLight {
-    vec3 pos;
-    vec3 color;
-    float linear_attenuation;
-    float quadratic_attenuation;
-};
-
-struct DirectionalLight {
-	vec3 direction;
-	float strength;
-	vec3 color;
-};
+#include "types.glsl"
 
 // Input
 in vec3 v_normal;
@@ -26,13 +14,6 @@ uniform int u_num_point_lights;
 uniform PointLight[8] u_point_lights;
 uniform DirectionalLight u_dir_light;
 
-struct Material {
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-	float shininess;
-	sampler2D diffuse_texture;
-};
 uniform Material u_material;
 
 // Output

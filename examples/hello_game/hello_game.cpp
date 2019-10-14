@@ -114,7 +114,7 @@ class HelloGame : public pxl::Game {
   void Update(float time_elapsed) override {
     static float gamma = 2.2f;
     scene->Update(time_elapsed);
-    framebuffers.first->Start();
+    framebuffers.first->Begin();
     // prog->Bind();
 
     mesh->rotation += Eigen::Vector3f(0, 90 * time_elapsed, 0);
@@ -127,10 +127,10 @@ class HelloGame : public pxl::Game {
       ImGui::End();
     }
 
-    pxl::SceneRenderer::RenderScene(*scene);
+    pxl::SceneRenderer::RenderScene(*scene, framebuffers.first);
     framebuffers.first->End();
 
-    framebuffers.second->Start();
+    framebuffers.second->Begin();
     pxl::OglGammaRenderer::GetInstance()->RenderTexture(
         framebuffers.first->GetColorAttachment(0), gamma);
     framebuffers.second->End();

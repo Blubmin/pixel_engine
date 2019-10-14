@@ -5,11 +5,15 @@
 
 #include <pixel_engine/directional_light.h>
 #include <pixel_engine/ogl_mesh.h>
+#include <pixel_engine/ogl_ssao_renderer.h>
+#include <pixel_engine/ogl_utilities.h>
 #include <pixel_engine/point_light.h>
 #include <pixel_engine/utilities.h>
 
 namespace pxl {
 std::shared_ptr<OglFramebuffer> SceneRenderer::g_buffer_(nullptr);
+
+std::shared_ptr<OglFramebuffer> SceneRenderer::ssao_buffer_(nullptr);
 
 std::shared_ptr<Program> SceneRenderer::mesh_prog_(nullptr);
 
@@ -38,14 +42,18 @@ void SceneRenderer::RenderScene(const Scene& scene,
 
   // Draw meshes
   GLint output_framebuffer;
-  g_buffer_->Start();
+  g_buffer_->Begin();
   RenderGBuffers(scene, gamma);
   g_buffer_->End();
 
+  // Draw ssao
+  ssao_buffer_->Begin();
+  OglSsaoRenderer::GetInstance()->RenderTexture(*g_buffer_, *scene.camera);
+  ssao_buffer_->End();
+
   // Draw deferred lighting
-  dst_framebuffer->Start();
+  dst_framebuffer->Begin();
   RenderDeferredLighting(scene, gamma);
-  glClear(GL_DEPTH_BUFFER_BIT);
   dst_framebuffer->BlitDepth(*g_buffer_);
 
   // Draw Skybox
@@ -157,6 +165,8 @@ void SceneRenderer::RenderDeferredLighting(const Scene& scene, float gamma) {
   prog->SetUniform1i("u_position_texture", 1);
   g_buffer_->GetColorAttachment(2)->Use(2);
   prog->SetUniform1i("u_normal_texture", 2);
+  ssao_buffer_->GetColorAttachment(0)->Use(3);
+  prog->SetUniform1i("u_ssao_texture", 3);
 
   deferred_lighting_prog_->DrawQuad();
   prog->UnBind();
@@ -166,6 +176,8 @@ void SceneRenderer::Init() {
   glDisable(GL_BLEND);
   g_buffer_ = std::make_shared<OglFramebuffer>(1920, 1080, 4);
   g_buffer_->Bind();
+  ssao_buffer_ = std::make_shared<OglFramebuffer>(1920, 1080);
+  ssao_buffer_->Bind();
   mesh_prog_ = std::make_shared<Program>(
       boost::filesystem::path(__FILE__).parent_path() / "shaders" / "mesh.vert",
       boost::filesystem::path(__FILE__).parent_path() / "shaders" /

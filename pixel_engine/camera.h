@@ -16,8 +16,8 @@ class Camera : public Entity {
   float near_plane;
   float far_plane;
 
-  Eigen::Matrix4f GetPerspective();
-  Eigen::Matrix4f GetView();
+  Eigen::Matrix4f GetPerspective() const;
+  Eigen::Matrix4f GetView() const;
 
  private:
   static std::shared_ptr<MeshEntity> mesh_;

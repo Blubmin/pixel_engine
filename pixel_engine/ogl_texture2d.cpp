@@ -119,6 +119,11 @@ void OglTexture2d::Use(uint32_t texture_unit) const {
   glBindTexture(GL_TEXTURE_2D, texture_id);
 }
 
+void OglTexture2d::SetFilterMode(GLenum filter_mode) const {
+  glTextureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, filter_mode);
+  glTextureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, filter_mode);
+}
+
 void OglTexture2d::SetWrapMode(GLenum wrap_mode) const {
   glTextureParameteri(texture_id, GL_TEXTURE_WRAP_S, wrap_mode);
   glTextureParameteri(texture_id, GL_TEXTURE_WRAP_T, wrap_mode);

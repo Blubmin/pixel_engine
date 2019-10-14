@@ -8,7 +8,10 @@
 namespace pxl {
 OglFramebuffer::OglFramebuffer(uint32_t width, uint32_t height,
                                uint32_t color_attachments)
-    : width_(width), height_(height) {
+    : width_(width),
+      height_(height),
+      clear_color_({.15, .15, .15, 1}),
+      prev_clear_color_(4) {
   for (uint32_t i = 0; i < color_attachments; ++i) {
     color_attachments_.emplace(
         i, std::make_shared<OglTexture2d>(width_, height_, Texture2d::FLOAT));
@@ -31,6 +34,7 @@ void OglFramebuffer::Bind() {
     auto& texture = pair.second;
     texture->Bind();
 
+    texture->SetWrapMode(GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, texture->GetTextureId());
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachment,
                            GL_TEXTURE_2D, texture->GetTextureId(), 0);
@@ -50,17 +54,40 @@ void OglFramebuffer::Bind() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void OglFramebuffer::Start() {
+void OglFramebuffer::SetClearColor(float r, float g, float b, float a) {
+  clear_color_[0] = r;
+  clear_color_[1] = g;
+  clear_color_[2] = b;
+  clear_color_[3] = a;
+}
+
+void OglFramebuffer::Begin() {
   glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id_);
   glViewport(0, 0, width_, height_);
-  glClearColor(0.15f, 0.15f, 0.15f, 1.f);
+  glClearColor(clear_color_[0], clear_color_[1], clear_color_[2],
+               clear_color_[3]);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void OglFramebuffer::End() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glClearColor(.15f, .15f, .15f, 1.f);
   glViewport(0, 0, Game::State.window_width, Game::State.window_height);
+}
+
+void OglFramebuffer::Push() {
+  glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prev_framebuffer_id_);
+  glGetIntegerv(GL_VIEWPORT, prev_viewport_);
+  glGetFloatv(GL_COLOR_CLEAR_VALUE, prev_clear_color_.data());
+  Begin();
+}
+
+void OglFramebuffer::Pop() {
+  End();
+  glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer_id_);
+  glViewport(prev_viewport_[0], prev_viewport_[1], prev_viewport_[2],
+             prev_viewport_[3]);
+  glClearColor(prev_clear_color_[0], prev_clear_color_[1], prev_clear_color_[2],
+               prev_clear_color_[3]);
 }
 
 void OglFramebuffer::BlitDepth(const OglFramebuffer& src_framebuffer) {

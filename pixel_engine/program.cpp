@@ -192,8 +192,17 @@ void Program::SetUniform4fv(const std::string& name, const float* data) const {
   glUniform4fv(GetUniformLocation(name), 1, data);
 }
 
-void Program::SetUniform3fv(const std::string& name, const float* data) const {
-  glUniform3fv(GetUniformLocation(name), 1, data);
+void Program::SetUniform3fv(const std::string& name, const float* data,
+                            uint32_t count) const {
+  glUniform3fv(GetUniformLocation(name), count, data);
+}
+
+void Program::SetUniform2fv(const std::string& name, const float* data) const {
+  glUniform2fv(GetUniformLocation(name), 1, data);
+}
+
+void Program::SetUniform2f(const std::string& name, float v1, float v2) const {
+  glUniform2f(GetUniformLocation(name), v1, v2);
 }
 
 void Program::SetUniform1f(const std::string& name, float data) const {

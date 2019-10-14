@@ -17,6 +17,7 @@ list(APPEND SOURCE_FILES
   ogl_material.cpp
   ogl_mesh.cpp
   ogl_post_renderer.cpp
+  ogl_ssao_renderer.cpp
   ogl_texture2d.cpp
   ogl_texture_renderer.cpp
   ogl_utilities.cpp
@@ -50,6 +51,7 @@ list(APPEND HEADER_FILES
   ogl_material.h
   ogl_mesh.h
   ogl_post_renderer.h
+  ogl_ssao_renderer.h
   ogl_texture2d.h
   ogl_texture_renderer.h
   ogl_utilities.h

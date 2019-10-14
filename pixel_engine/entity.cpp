@@ -38,7 +38,7 @@ void Entity::AddComponent(std::shared_ptr<Component> component) {
   component->SetOwner(shared_from_this());
 }
 
-Eigen::Matrix4f Entity::GetTransform() {
+Eigen::Matrix4f Entity::GetTransform() const {
   Eigen::Affine3f transform = Eigen::Affine3f::Identity();
   if (!parent.expired()) {
     auto p = parent.lock();

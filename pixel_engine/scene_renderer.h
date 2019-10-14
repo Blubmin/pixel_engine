@@ -28,5 +28,6 @@ class SceneRenderer {
 
  public:
   static std::shared_ptr<OglFramebuffer> g_buffer_;
+  static std::shared_ptr<OglFramebuffer> ssao_buffer_;
 };
 }  // namespace pxl

@@ -31,7 +31,7 @@ class Entity : public std::enable_shared_from_this<Entity> {
     return nullptr;
   }
 
-  Eigen::Matrix4f GetTransform();
+  Eigen::Matrix4f GetTransform() const;
 
   std::weak_ptr<Entity> parent;
   std::vector<std::shared_ptr<Entity>> children;

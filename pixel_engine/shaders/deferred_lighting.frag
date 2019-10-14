@@ -11,6 +11,7 @@ uniform vec3 u_camera_pos;
 uniform sampler2D u_albedo_spec_texture;
 uniform sampler2D u_position_texture;
 uniform sampler2D u_normal_texture;
+uniform sampler2D u_ssao_texture;
 uniform int u_num_point_lights;
 uniform PointLight u_point_lights[8];
 uniform DirectionalLight u_dir_light;
@@ -51,8 +52,9 @@ void main() {
 	pos = texture2D(u_position_texture, v_uv).rgb;
 	normal = texture2D(u_normal_texture, v_uv).rgb;
 	shininess = texture2D(u_albedo_spec_texture, v_uv).a;
+	float ssao = texture2D(u_ssao_texture, v_uv).r;
 
-	vec3 ambient = albedo * 0;
+	vec3 ambient = albedo * ssao * .3;
 	view_vec = normalize(u_camera_pos - pos);
 
 	final_color = ambient;

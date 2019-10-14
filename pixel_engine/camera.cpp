@@ -25,7 +25,7 @@ void Camera::Draw(const Program& prog) {
   mesh_->Draw(prog);
 }
 
-Eigen::Matrix4f Camera::GetPerspective() {
+Eigen::Matrix4f Camera::GetPerspective() const {
   Eigen::Matrix4f perspective = Eigen::Matrix4f::Zero();
   float half_tan = std::tan(fov / 2.f * M_PI / 180.f);
   perspective(0, 0) = 1.f / half_tan;
@@ -36,7 +36,7 @@ Eigen::Matrix4f Camera::GetPerspective() {
   return perspective;
 }
 
-Eigen::Matrix4f Camera::GetView() {
+Eigen::Matrix4f Camera::GetView() const {
   Eigen::Affine3f transform(GetTransform());
   Eigen::Isometry3f isometry;
   isometry.translation() = transform.translation();

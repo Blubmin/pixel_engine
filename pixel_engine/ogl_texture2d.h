@@ -17,6 +17,7 @@ class OglTexture2d : public Texture2d {
 
   GLuint GetTextureId() const;
   void Use(uint32_t texture_unit) const;
+  void SetFilterMode(GLenum filter_mode) const;
   void SetWrapMode(GLenum wrap_mode) const;
 
  private:

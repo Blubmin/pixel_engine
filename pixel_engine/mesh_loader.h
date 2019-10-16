@@ -43,6 +43,10 @@ class MeshLoader {
         material->diffuse_texture_path =
             path.parent_path() / material->diffuse_texture_path;
       }
+      if (!material->normal_map_path.empty()) {
+        material->normal_map_path =
+            path.parent_path() / material->normal_map_path;
+      }
     }
   }
 
@@ -65,7 +69,7 @@ class MeshLoader {
                           aiProcess_FindDegenerates | aiProcess_SortByPType |
                           aiProcess_GenUVCoords | aiProcess_FindInvalidData |
                           aiProcess_FindInstances | aiProcess_OptimizeMeshes |
-                          aiProcess_OptimizeGraph;
+                          aiProcess_OptimizeGraph | aiProcess_CalcTangentSpace;
 
     const aiScene *ai_scene = importer.ReadFile(path.string(), read_flags);
     if (ai_scene == nullptr) {

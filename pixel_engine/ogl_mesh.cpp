@@ -24,7 +24,7 @@ void OglMesh::Bind() {
     return;
   }
   vaos.resize(sub_meshes.size(), -1);
-  buffers.resize(sub_meshes.size(), std::vector<GLuint>(4));
+  buffers.resize(sub_meshes.size(), std::vector<GLuint>(5));
   glGenVertexArrays(vaos.size(), vaos.data());
   for (size_t i = 0; i < sub_meshes.size(); ++i) {
     auto sub_mesh = sub_meshes[i];
@@ -47,16 +47,23 @@ void OglMesh::Bind() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(1);
 
-    // UVs
+    // Tangent
     glBindBuffer(GL_ARRAY_BUFFER, buffer[2]);
+    glBufferData(GL_ARRAY_BUFFER, sub_mesh->tangents.size() * sizeof(GLfloat),
+                 sub_mesh->tangents.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(2);
+
+    // UVs
+    glBindBuffer(GL_ARRAY_BUFFER, buffer[3]);
     glBufferData(GL_ARRAY_BUFFER,
                  sub_mesh->texture_coordinates.size() * sizeof(GLfloat),
                  sub_mesh->texture_coordinates.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(3);
 
     // Indices
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[3]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[4]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                  sub_mesh->triangles.size() * sizeof(GLuint),
                  sub_mesh->triangles.data(), GL_STATIC_DRAW);

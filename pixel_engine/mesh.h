@@ -15,6 +15,7 @@ class SubMesh {
   std::vector<uint32_t> triangles;
   std::vector<float> positions;
   std::vector<float> normals;
+  std::vector<float> tangents;
   std::vector<float> texture_coordinates;
   uint32_t material_idx;
 };

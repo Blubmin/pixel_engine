@@ -101,6 +101,7 @@ void OglTexture2d::Bind() {
   // Set data
   glTexImage2D(GL_TEXTURE_2D, 0, GetInternalFormat(*this), width, height, 0,
                GetDataFormat(*this), GetDataType(format), image_data);
+  glGenerateMipmap(GL_TEXTURE_2D);
 
   // Set parameters
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -121,6 +122,9 @@ void OglTexture2d::Use(uint32_t texture_unit) const {
 
 void OglTexture2d::SetFilterMode(GLenum filter_mode) const {
   glTextureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, filter_mode);
+  if (filter_mode == GL_LINEAR_MIPMAP_LINEAR) {
+    filter_mode = GL_LINEAR;
+  }
   glTextureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, filter_mode);
 }
 

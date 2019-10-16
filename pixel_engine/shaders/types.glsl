@@ -4,6 +4,7 @@ struct Material {
 	vec3 specular;
 	float shininess;
 	sampler2D diffuse_texture;
+	sampler2D normal_map;
 };
 
 struct PointLight {

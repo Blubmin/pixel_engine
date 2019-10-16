@@ -22,10 +22,12 @@ class OglMaterial : public Material {
       const std::string& diffuse_name = "u_material.diffuse",
       const std::string& specular_name = "u_material.specular",
       const std::string& shininess_name = "u_material.shininess",
-      const std::string& diffuse_texture_name = "u_material.diffuse_texture");
+      const std::string& diffuse_texture_name = "u_material.diffuse_texture",
+      const std::string& normal_map_name = "u_material.normal_map");
 
  public:
   std::shared_ptr<OglTexture2d> diffuse_texture;
+  std::shared_ptr<OglTexture2d> normal_map;
 };
 
 }  // namespace pxl

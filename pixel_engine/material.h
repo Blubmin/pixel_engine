@@ -16,5 +16,6 @@ class Material {
   Eigen::Vector3f specular;
   float shininess;
   boost::filesystem::path diffuse_texture_path;
+  boost::filesystem::path normal_map_path;
 };
 }  // namespace pxl

@@ -25,7 +25,11 @@ class MeshLoader {
     MeshType mesh;
     for (size_t i = 0; i < ai_scene->mNumMeshes; ++i) {
       const aiMesh *ai_mesh = ai_scene->mMeshes[i];
-      mesh.sub_meshes.emplace_back(std::move(ParseMesh(ai_mesh)));
+      auto sub_mesh = ParseMesh(ai_mesh);
+      if (sub_mesh == nullptr) {
+        continue;
+      }
+      mesh.sub_meshes.emplace_back(std::move(sub_mesh));
     }
 
     for (size_t i = 0; i < ai_scene->mNumMaterials; ++i) {

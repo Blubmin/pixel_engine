@@ -120,6 +120,12 @@ void OglTexture2d::Use(uint32_t texture_unit) const {
   glBindTexture(GL_TEXTURE_2D, texture_id);
 }
 
+void OglTexture2d::SetSampler2D(const Program& prog, const std::string& name,
+                                uint32_t texture_unit) {
+  Use(texture_unit);
+  prog.SetUniform1i(name, texture_unit);
+}
+
 void OglTexture2d::SetFilterMode(GLenum filter_mode) const {
   glTextureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, filter_mode);
   if (filter_mode == GL_LINEAR_MIPMAP_LINEAR) {
@@ -131,5 +137,13 @@ void OglTexture2d::SetFilterMode(GLenum filter_mode) const {
 void OglTexture2d::SetWrapMode(GLenum wrap_mode) const {
   glTextureParameteri(texture_id, GL_TEXTURE_WRAP_S, wrap_mode);
   glTextureParameteri(texture_id, GL_TEXTURE_WRAP_T, wrap_mode);
+}
+
+void OglTexture2d::SetBorder(float r, float g, float b, float a) {
+  Eigen::Vector4f color(r, g, b, a);
+  glBindTexture(GL_TEXTURE_2D, texture_id);
+  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color.data());
+  glTexImage2D(GL_TEXTURE_2D, 1, GetInternalFormat(*this), width, height, 0,
+               GetDataFormat(*this), GetDataType(format), 0);
 }
 }  // namespace pxl

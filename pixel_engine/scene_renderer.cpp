@@ -11,7 +11,22 @@
 #include <pixel_engine/utilities.h>
 
 namespace pxl {
+namespace {
+Eigen::Matrix4f GetTbnMatrix(Eigen::Vector3f normal) {
+  normal.normalize();
+  Eigen::Vector3f tangent = Eigen::Vector3f::UnitY().cross(normal);
+  Eigen::Vector3f bitangent = normal.cross(tangent);
+  Eigen::Matrix4f tbn = Eigen::Matrix4f::Identity();
+  tbn.block<3, 1>(0, 0) = tangent;
+  tbn.block<3, 1>(0, 1) = bitangent;
+  tbn.block<3, 1>(0, 2) = normal;
+  return tbn;
+}
+}  // namespace
+
 std::shared_ptr<OglFramebuffer> SceneRenderer::g_buffer_(nullptr);
+
+std::shared_ptr<OglFramebuffer> SceneRenderer::shadow_buffer_(nullptr);
 
 std::shared_ptr<OglFramebuffer> SceneRenderer::ssao_buffer_(nullptr);
 
@@ -22,6 +37,8 @@ std::shared_ptr<Program> SceneRenderer::grid_prog_(nullptr);
 std::shared_ptr<Program> SceneRenderer::pose_prog_(nullptr);
 
 std::shared_ptr<Program> SceneRenderer::skybox_prog_(nullptr);
+
+std::shared_ptr<Program> SceneRenderer::shadow_map_prog_(nullptr);
 
 std::shared_ptr<Program> SceneRenderer::deferred_prog_(nullptr);
 
@@ -50,6 +67,11 @@ void SceneRenderer::RenderScene(const Scene& scene,
   ssao_buffer_->Begin();
   OglSsaoRenderer::GetInstance()->RenderTexture(*g_buffer_, *scene.camera);
   ssao_buffer_->End();
+
+  // Draw shadow map
+  shadow_buffer_->Begin();
+  RenderShadow(scene);
+  shadow_buffer_->End();
 
   // Draw deferred lighting
   dst_framebuffer->Begin();
@@ -123,6 +145,53 @@ void SceneRenderer::RenderGBuffers(const Scene& scene, float gamma) {
   deferred_prog_->UnBind();
 }
 
+void SceneRenderer::RenderShadow(const Scene& scene) {
+  auto meshes = scene.GetEntities<MeshEntity>();
+  auto cameras = scene.GetEntities<Camera>();
+
+  auto dir_light = scene.GetEntity<DirectionalLight>();
+  auto light_dir = -dir_light->direction.normalized();
+
+  auto camera = Camera();
+  camera.position = light_dir * 20;
+  camera.rotation.y() = -135;
+  camera.rotation.x() = -45;
+
+  auto tbn = GetTbnMatrix(light_dir);
+
+  auto ortho = GetOrthoProjection(-10, 10, -10, 10, scene.camera->far_plane,
+                                  scene.camera->near_plane - 20);
+
+  shadow_map_prog_->Bind();
+  shadow_map_prog_->SetUniformMatrix4fv("u_perspective", ortho.data());
+  shadow_map_prog_->SetUniformMatrix4fv("u_view", tbn.inverse().eval().data());
+
+  // Draw Meshes
+  for (auto mesh : meshes) {
+    shadow_map_prog_->SetUniformMatrix4fv("u_model",
+                                          mesh->GetTransform().data());
+    std::dynamic_pointer_cast<OglMesh>(mesh->mesh)->draw_materials = false;
+    mesh->Draw(*shadow_map_prog_);
+    std::dynamic_pointer_cast<OglMesh>(mesh->mesh)->draw_materials = true;
+  }
+
+  // Draw Camera Meshes
+  for (auto camera : cameras) {
+    if (scene.camera == camera) {
+      continue;
+    }
+    shadow_map_prog_->SetUniformMatrix4fv("u_model",
+                                          camera->GetTransform().data());
+    std::dynamic_pointer_cast<OglMesh>(camera->mesh->mesh)->draw_materials =
+        false;
+    camera->Draw(*shadow_map_prog_);
+    std::dynamic_pointer_cast<OglMesh>(camera->mesh->mesh)->draw_materials =
+        true;
+  }
+
+  shadow_map_prog_->UnBind();
+}
+
 void SceneRenderer::RenderDeferredLighting(const Scene& scene, float gamma) {
   auto prog = deferred_lighting_prog_->GetProgram();
   auto point_lights = scene.GetEntities<PointLight>();
@@ -159,14 +228,20 @@ void SceneRenderer::RenderDeferredLighting(const Scene& scene, float gamma) {
     prog->SetUniform1f("u_dir_light.strength", 0);
   }
 
-  g_buffer_->GetColorAttachment(0)->Use(0);
-  prog->SetUniform1i("u_albedo_spec_texture", 0);
-  g_buffer_->GetColorAttachment(1)->Use(1);
-  prog->SetUniform1i("u_position_texture", 1);
-  g_buffer_->GetColorAttachment(2)->Use(2);
-  prog->SetUniform1i("u_normal_texture", 2);
-  ssao_buffer_->GetColorAttachment(0)->Use(3);
-  prog->SetUniform1i("u_ssao_texture", 3);
+  g_buffer_->GetColorAttachment(0)->SetSampler2D(*prog, "u_albedo_spec_texture",
+                                                 0);
+  g_buffer_->GetColorAttachment(1)->SetSampler2D(*prog, "u_position_texture",
+                                                 1);
+  g_buffer_->GetColorAttachment(2)->SetSampler2D(*prog, "u_normal_texture", 2);
+  ssao_buffer_->GetColorAttachment(0)->SetSampler2D(*prog, "u_ssao_texture", 3);
+  shadow_buffer_->GetColorAttachment(0)->SetSampler2D(*prog, "u_shadow_texture",
+                                                      4);
+
+  auto tbn = GetTbnMatrix(-scene.GetEntity<DirectionalLight>()->direction);
+  prog->SetUniformMatrix4fv("u_shadow", tbn.inverse().eval().data());
+  Eigen::Matrix4f ortho = GetOrthoProjection(
+      -10, 10, -10, 10, scene.camera->far_plane, scene.camera->near_plane - 20);
+  prog->SetUniformMatrix4fv("u_map", ortho.data());
 
   deferred_lighting_prog_->DrawQuad();
   prog->UnBind();
@@ -176,6 +251,12 @@ void SceneRenderer::Init() {
   glDisable(GL_BLEND);
   g_buffer_ = std::make_shared<OglFramebuffer>(1920, 1080, 4);
   g_buffer_->Bind();
+  shadow_buffer_ = std::make_shared<OglFramebuffer>(2048, 2048);
+  shadow_buffer_->Bind();
+  shadow_buffer_->SetClearColor(0, 0, 0);
+  shadow_buffer_->GetColorAttachment(0)->SetWrapMode(GL_CLAMP_TO_BORDER);
+  shadow_buffer_->GetColorAttachment(0)->SetBorder(FLT_MAX, 1, 1);
+  shadow_buffer_->GetColorAttachment(0)->SetFilterMode(GL_LINEAR);
   ssao_buffer_ = std::make_shared<OglFramebuffer>(1920, 1080);
   ssao_buffer_->Bind();
   mesh_prog_ = std::make_shared<Program>(
@@ -195,6 +276,11 @@ void SceneRenderer::Init() {
           "skybox.vert",
       boost::filesystem::path(__FILE__).parent_path() / "shaders" /
           "skybox.frag");
+  shadow_map_prog_ = std::make_shared<Program>(
+      boost::filesystem::path(__FILE__).parent_path() / "shaders" /
+          "shadow.vert",
+      boost::filesystem::path(__FILE__).parent_path() / "shaders" /
+          "shadow.frag");
   deferred_prog_ = std::make_shared<Program>(
       boost::filesystem::path(__FILE__).parent_path() / "shaders" / "mesh.vert",
       boost::filesystem::path(__FILE__).parent_path() / "shaders" /

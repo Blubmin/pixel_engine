@@ -5,10 +5,10 @@
 #include <pixel_engine/program.h>
 
 namespace pxl {
-OglMesh::OglMesh() : is_bound_(false) {}
+OglMesh::OglMesh() : draw_materials(true), is_bound_(false) {}
 
 OglMesh::OglMesh(std::shared_ptr<SubMesh> sub_mesh)
-    : Mesh(sub_mesh), is_bound_(false) {}
+    : Mesh(sub_mesh), draw_materials(true), is_bound_(false) {}
 
 OglMesh::~OglMesh() {
   if (!vaos.empty()) {
@@ -86,9 +86,11 @@ void OglMesh::Draw(const Program& prog) {
   for (size_t i = 0; i < sub_meshes.size(); ++i) {
     const auto sub_mesh = sub_meshes[i];
 
-    const auto material = std::dynamic_pointer_cast<OglMaterial>(
-        materials[sub_mesh->material_idx]);
-    material->Use(prog);
+    if (draw_materials) {
+      const auto material = std::dynamic_pointer_cast<OglMaterial>(
+          materials[sub_mesh->material_idx]);
+      material->Use(prog);
+    }
 
     glBindVertexArray(vaos[i]);
     glDrawElements(GL_TRIANGLES, sub_mesh->triangles.size(), GL_UNSIGNED_INT,

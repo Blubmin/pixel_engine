@@ -23,6 +23,7 @@ class OglMesh : public Mesh {
   GLuint vao;
   std::vector<GLuint> vaos;
   std::vector<std::vector<GLuint>> buffers;
+  bool draw_materials;
 
  private:
   bool is_bound_;

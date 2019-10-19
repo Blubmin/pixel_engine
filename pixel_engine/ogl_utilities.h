@@ -4,6 +4,7 @@
 
 #include <GL/gl3w.h>>
 #include <glog/logging.h>
+#include <Eigen/Core>
 
 #define OGL_LOG_ERROR(severity)                                       \
   {                                                                   \
@@ -13,4 +14,8 @@
 
 namespace pxl {
 std::string GetErrorString(GLenum err);
+
+Eigen::Matrix4f GetOrthoProjection(float left, float right, float bottom,
+                                   float top, float far_plane,
+                                   float near_plane);
 }  // namespace pxl

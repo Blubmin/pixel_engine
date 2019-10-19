@@ -16,6 +16,7 @@ class SceneRenderer {
 
  private:
   static void RenderGBuffers(const Scene& scene, float gamma);
+  static void RenderShadow(const Scene& scene);
   static void RenderDeferredLighting(const Scene& scene, float gamma);
   static void Init();
 
@@ -23,11 +24,13 @@ class SceneRenderer {
   static std::shared_ptr<Program> grid_prog_;
   static std::shared_ptr<Program> pose_prog_;
   static std::shared_ptr<Program> skybox_prog_;
+  static std::shared_ptr<Program> shadow_map_prog_;
   static std::shared_ptr<Program> deferred_prog_;
   static std::shared_ptr<OglPostRenderer> deferred_lighting_prog_;
 
  public:
   static std::shared_ptr<OglFramebuffer> g_buffer_;
+  static std::shared_ptr<OglFramebuffer> shadow_buffer_;
   static std::shared_ptr<OglFramebuffer> ssao_buffer_;
 };
 }  // namespace pxl

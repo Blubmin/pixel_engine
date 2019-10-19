@@ -10,19 +10,19 @@
 #include <pixel_engine/ogl_mesh.h>
 
 namespace pxl {
-std::shared_ptr<MeshEntity> Camera::mesh_(nullptr);
+std::shared_ptr<MeshEntity> Camera::mesh(nullptr);
 
 Camera::Camera() : fov(90.f), near_plane(0.01f), far_plane(1000.f) {}
 
 void Camera::Draw(const Program& prog) {
-  if (mesh_ == nullptr) {
-    mesh_ = MeshLoader::LoadMeshEntity<OglMesh>(
+  if (mesh == nullptr) {
+    mesh = MeshLoader::LoadMeshEntity<OglMesh>(
         (boost::filesystem::path(__FILE__).parent_path() / "meshes" / "camera" /
          "camera.obj"));
-    CHECK(mesh_ != nullptr);
-    mesh_->Bind();
+    CHECK(mesh != nullptr);
+    mesh->Bind();
   }
-  mesh_->Draw(prog);
+  mesh->Draw(prog);
 }
 
 Eigen::Matrix4f Camera::GetPerspective() const {

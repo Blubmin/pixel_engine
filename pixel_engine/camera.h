@@ -15,11 +15,9 @@ class Camera : public Entity {
   float fov;
   float near_plane;
   float far_plane;
+  static std::shared_ptr<MeshEntity> mesh;
 
   Eigen::Matrix4f GetPerspective() const;
   Eigen::Matrix4f GetView() const;
-
- private:
-  static std::shared_ptr<MeshEntity> mesh_;
 };
 }  // namespace pxl

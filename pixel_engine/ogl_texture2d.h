@@ -5,6 +5,8 @@
 #include <GL/gl3w.h>>
 #include <boost/filesystem.hpp>
 
+#include <pixel_engine/program.h>
+
 namespace pxl {
 class OglTexture2d : public Texture2d {
  public:
@@ -17,8 +19,11 @@ class OglTexture2d : public Texture2d {
 
   GLuint GetTextureId() const;
   void Use(uint32_t texture_unit) const;
+  void SetSampler2D(const Program& prog, const std::string& name,
+                    uint32_t texture_unit);
   void SetFilterMode(GLenum filter_mode) const;
   void SetWrapMode(GLenum wrap_mode) const;
+  void SetBorder(float r, float g, float b, float a = 1);
 
  private:
   GLuint texture_id;

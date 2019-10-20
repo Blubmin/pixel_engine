@@ -15,7 +15,6 @@ class Entity : public std::enable_shared_from_this<Entity> {
 
   void Update(float time_elapsed);
 
-  void SetParent(std::shared_ptr<Entity> parent);
   void AddChild(std::shared_ptr<Entity> child);
   void AddComponent(std::shared_ptr<Component> component);
 
@@ -31,6 +30,17 @@ class Entity : public std::enable_shared_from_this<Entity> {
     return nullptr;
   }
 
+  template <typename ChildType>
+  std::shared_ptr<ChildType> GetChild() {
+    for (auto child : children) {
+      auto typed_child = std::dynamic_pointer_cast<ChildType>(child);
+      if (typed_child != nullptr) {
+        return typed_child;
+      }
+    }
+    return nullptr;
+  }
+
   Eigen::Matrix4f GetTransform() const;
 
   std::weak_ptr<Entity> parent;
@@ -40,5 +50,8 @@ class Entity : public std::enable_shared_from_this<Entity> {
   Eigen::Vector3f position;
   Eigen::Vector3f rotation;
   Eigen::Vector3f scale;
+
+ protected:
+  void SetParent(std::shared_ptr<Entity> parent);
 };
 }  // namespace pxl

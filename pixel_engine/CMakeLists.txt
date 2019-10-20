@@ -5,6 +5,7 @@ list(APPEND SOURCE_FILES
   directional_light.cpp
   empty.cpp
   entity.cpp
+  fps_controller.cpp
   free_camera_component.cpp
   game_mode.cpp
   game.cpp
@@ -39,6 +40,7 @@ list(APPEND HEADER_FILES
   eigen_typedefs.h
   empty.h
   entity.h
+  fps_controller.h
   free_camera_component.h
   game_mode.h
   game.h

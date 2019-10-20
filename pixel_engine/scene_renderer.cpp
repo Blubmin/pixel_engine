@@ -200,7 +200,8 @@ void SceneRenderer::RenderDeferredLighting(const Scene& scene, float gamma) {
   prog->Bind();
 
   prog->SetUniform1f("u_gamma", gamma);
-  prog->SetUniform3fv("u_camera_pos", scene.camera->position.data());
+  prog->SetUniform3fv("u_camera_pos",
+                      scene.camera->GetTransform().block<3, 1>(0, 3).data());
   prog->SetUniform1i("u_num_point_lights", point_lights.size());
 
   // Point lights

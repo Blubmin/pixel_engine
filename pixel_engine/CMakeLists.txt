@@ -29,6 +29,7 @@ list(APPEND SOURCE_FILES
   skybox.cpp
   sphere.cpp
   texture2d.cpp
+  thread_pool.cpp
   utilities.cpp
 )
 
@@ -64,6 +65,7 @@ list(APPEND HEADER_FILES
   skybox.h
   sphere.h
   texture2d.h
+  thread_pool.h
   utilities.h
 )
 

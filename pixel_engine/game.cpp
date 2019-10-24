@@ -20,6 +20,9 @@ void GLFWErrorCallback(int error, const char *description) {
 }
 }  // namespace
 
+ThreadPool Game::RenderingThread(1);
+ThreadPool Game::BackgroundThreadPool(4);
+
 float GameState::GetAspectRatio() {
   return window_width / float(window_height);
 }
@@ -98,6 +101,8 @@ void Game::Run() {
 
   auto time = std::chrono::system_clock::now();
 
+  BackgroundThreadPool.Start();
+
   while (!glfwWindowShouldClose(State.window)) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -111,10 +116,16 @@ void Game::Run() {
     // Run implemented game loop
     auto now = std::chrono::system_clock::now();
     auto time_spent = now - time;
+    time = now;
     Update(std::chrono::duration_cast<
                std::chrono::duration<float, std::ratio<1, 1>>>(time_spent)
                .count());
-    time = now;
+    auto thread_id = std::this_thread::get_id();
+    RenderingThread.Post([&]() {
+      CHECK(thread_id == std::this_thread::get_id()) << "Fuck";
+      LOG(INFO) << thread_id;
+    });
+    RenderingThread.Run();
 
     // Show fps
     boost::format fps_format("%.02lf fps");
@@ -137,6 +148,7 @@ void Game::Run() {
       glfwSetWindowShouldClose(State.window, GLFW_TRUE);
     }
   }
+  BackgroundThreadPool.Stop();
 }
 
 void Game::WindowResizeCallback(GLFWwindow *window, int width, int height) {

@@ -6,6 +6,9 @@
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
+#include <pixel_engine/thread.h>
+#include <pixel_engine/thread_pool.h>
+
 namespace pxl {
 struct GameState {
   std::string game_name;
@@ -28,5 +31,8 @@ class Game {
 
   static GameState State;
   static void WindowResizeCallback(GLFWwindow* window, int width, int height);
+
+  static ThreadPool RenderingThread;
+  static ThreadPool BackgroundThreadPool;
 };
 }  // namespace pxl

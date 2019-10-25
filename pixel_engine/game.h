@@ -6,7 +6,6 @@
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
-#include <pixel_engine/thread.h>
 #include <pixel_engine/thread_pool.h>
 
 namespace pxl {

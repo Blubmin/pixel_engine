@@ -13,9 +13,12 @@
 #define CLAMP(A, T, B) ((T) < (A) ? (A) : (T) > (B) ? (B) : (T))
 
 namespace pxl {
-FpsController::FpsController() : speed(5) {}
+FpsController::FpsController() : speed(5), disable(false) {}
 
 void FpsController::Update(float time_elapsed) {
+  if (disable) {
+    return;
+  }
   auto owner_ptr = owner.lock();
   if (owner_ptr == nullptr) {
     return;

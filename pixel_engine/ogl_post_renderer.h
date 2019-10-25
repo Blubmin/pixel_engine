@@ -4,7 +4,7 @@
 #include <glog/logging.h>
 #include <boost/filesystem.hpp>
 
-#include <pixel_engine/eigen_typedefs.h>
+#include <pixel_engine/eigen_utilities.h>
 #include <pixel_engine/program.h>
 
 namespace pxl {

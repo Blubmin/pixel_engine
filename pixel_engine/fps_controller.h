@@ -12,6 +12,7 @@ class FpsController : public Component {
   void Update(float time_elapsed) override;
 
   float speed;
+  bool disable;
 
  private:
   Eigen::Vector3f GetMovementVector() const;

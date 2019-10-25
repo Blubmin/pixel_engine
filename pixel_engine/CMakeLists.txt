@@ -38,7 +38,7 @@ list(APPEND HEADER_FILES
   color.h
   component.h
   directional_light.h
-  eigen_typedefs.h
+  eigen_utilities.h
   empty.h
   entity.h
   fps_controller.h

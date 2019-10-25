@@ -6,7 +6,7 @@
 
 #include <Eigen/Core>
 
-#include <pixel_engine/eigen_typedefs.h>
+#include <pixel_engine/eigen_utilities.h>
 #include <pixel_engine/ogl_texture2d.h>
 #include <pixel_engine/program.h>
 

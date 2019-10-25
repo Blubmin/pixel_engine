@@ -120,11 +120,6 @@ void Game::Run() {
     Update(std::chrono::duration_cast<
                std::chrono::duration<float, std::ratio<1, 1>>>(time_spent)
                .count());
-    auto thread_id = std::this_thread::get_id();
-    RenderingThread.Post([&]() {
-      CHECK(thread_id == std::this_thread::get_id()) << "Fuck";
-      LOG(INFO) << thread_id;
-    });
     RenderingThread.Run();
 
     // Show fps

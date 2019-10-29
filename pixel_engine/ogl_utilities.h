@@ -16,6 +16,6 @@ namespace pxl {
 std::string GetErrorString(GLenum err);
 
 Eigen::Matrix4f GetOrthoProjection(float left, float right, float bottom,
-                                   float top, float far_plane,
-                                   float near_plane);
+                                   float top, float near_plane,
+                                   float far_plane);
 }  // namespace pxl

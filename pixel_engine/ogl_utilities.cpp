@@ -25,8 +25,8 @@ std::string GetErrorString(GLenum err) {
 }
 
 Eigen::Matrix4f GetOrthoProjection(float left, float right, float bottom,
-                                   float top, float far_plane,
-                                   float near_plane) {
+                                   float top, float near_plane,
+                                   float far_plane) {
   Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
   mat(0, 0) = 2 / (right - left);
   mat(1, 1) = 2 / (top - bottom);

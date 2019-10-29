@@ -1,9 +1,15 @@
 #include <pixel_engine/scene_renderer.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <array>
+
 #include <glog/logging.h>
 #include <boost/format.hpp>
 
 #include <pixel_engine/directional_light.h>
+#include <pixel_engine/eigen_utilities.h>
+#include <pixel_engine/game.h>
 #include <pixel_engine/ogl_mesh.h>
 #include <pixel_engine/ogl_ssao_renderer.h>
 #include <pixel_engine/ogl_utilities.h>
@@ -21,6 +27,60 @@ Eigen::Matrix4f GetTbnMatrix(Eigen::Vector3f normal) {
   tbn.block<3, 1>(0, 1) = bitangent;
   tbn.block<3, 1>(0, 2) = normal;
   return tbn;
+}
+
+std::array<float, 6> GetShadowExtents(const Eigen::Vector3f& light_dir,
+                                      const Camera& camera) {
+  std::array<float, 6> extents;
+
+  auto frustum_pts = camera.GetFrustumPoints();
+  for (auto& pt : frustum_pts) {
+    auto pt_world =
+        camera.GetTransform() * Eigen::Vector4f(pt.x(), pt.y(), pt.z(), 1);
+    pt = Eigen::Vector3f(pt_world.x(), pt_world.y(), pt_world.z());
+  }
+  auto tbn = Eigen::GetRotation(GetTbnMatrix(-light_dir)).inverse().eval();
+
+  Eigen::Vector3f pt0 = tbn * frustum_pts[0];
+  Eigen::Vector3f pt1 = tbn * frustum_pts[1];
+  Eigen::Vector3f pt2 = tbn * frustum_pts[2];
+  Eigen::Vector3f pt3 = tbn * frustum_pts[3];
+  Eigen::Vector3f pt4 = tbn * frustum_pts[4];
+  Eigen::Vector3f pt5 = tbn * frustum_pts[5];
+  Eigen::Vector3f pt6 = tbn * frustum_pts[6];
+  Eigen::Vector3f pt7 = tbn * frustum_pts[7];
+
+  auto min = Eigen::Min(
+      Eigen::Min(
+          Eigen::Min(
+              Eigen::Min(Eigen::Min(Eigen::Min(Eigen::Min(pt0, pt1), pt2), pt3),
+                         pt4),
+              pt5),
+          pt6),
+      pt7);
+  auto max = Eigen::Max(
+      Eigen::Max(
+          Eigen::Max(
+              Eigen::Max(Eigen::Max(Eigen::Max(Eigen::Max(pt0, pt1), pt2), pt3),
+                         pt4),
+              pt5),
+          pt6),
+      pt7);
+
+  extents[0] = min.x();
+  extents[1] = min.y();
+  extents[2] = min.z();
+  extents[3] = max.x();
+  extents[4] = max.y();
+  extents[5] = max.z();
+  return extents;
+}
+
+Eigen::Matrix4f GetShadowProjection(const Eigen::Vector3f& light_dir,
+                                    const Camera& camera) {
+  auto extents = GetShadowExtents(light_dir, camera);
+  return GetOrthoProjection(extents[0], extents[3], extents[1], extents[4],
+                            -extents[5], -extents[2]);
 }
 }  // namespace
 
@@ -81,7 +141,7 @@ void SceneRenderer::RenderScene(const Scene& scene,
   // Draw Skybox
   skybox_prog_->Bind();
   if (scene.skybox != nullptr) {
-    scene.skybox->position = scene.camera->position;
+    scene.skybox->position = Eigen::GetPosition(scene.camera->GetTransform());
     scene.skybox->scale = Eigen::Vector3f::Ones() *
                           (scene.camera->far_plane - FLT_EPSILON) /
                           std::sqrt(3);
@@ -146,21 +206,19 @@ void SceneRenderer::RenderGBuffers(const Scene& scene, float gamma) {
 }
 
 void SceneRenderer::RenderShadow(const Scene& scene) {
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_FRONT);
+
   auto meshes = scene.GetEntities<MeshEntity>();
   auto cameras = scene.GetEntities<Camera>();
 
   auto dir_light = scene.GetEntity<DirectionalLight>();
-  auto light_dir = -dir_light->direction.normalized();
+  auto light_dir = dir_light->direction.normalized();
 
-  auto camera = Camera();
-  camera.position = light_dir * 20;
-  camera.rotation.y() = -135;
-  camera.rotation.x() = -45;
+  auto tbn = GetTbnMatrix(-light_dir);
 
-  auto tbn = GetTbnMatrix(light_dir);
-
-  auto ortho = GetOrthoProjection(-10, 10, -10, 10, scene.camera->far_plane,
-                                  scene.camera->near_plane - 20);
+  // auto ortho = GetShadowProjection(light_dir, *scene.camera);
+  auto ortho = GetOrthoProjection(-40, 40, -40, 40, -100, 100);
 
   shadow_map_prog_->Bind();
   shadow_map_prog_->SetUniformMatrix4fv("u_perspective", ortho.data());
@@ -190,6 +248,9 @@ void SceneRenderer::RenderShadow(const Scene& scene) {
   }
 
   shadow_map_prog_->UnBind();
+
+  glCullFace(GL_BACK);
+  glDisable(GL_CULL_FACE);
 }
 
 void SceneRenderer::RenderDeferredLighting(const Scene& scene, float gamma) {
@@ -240,8 +301,9 @@ void SceneRenderer::RenderDeferredLighting(const Scene& scene, float gamma) {
 
   auto tbn = GetTbnMatrix(-scene.GetEntity<DirectionalLight>()->direction);
   prog->SetUniformMatrix4fv("u_shadow", tbn.inverse().eval().data());
-  Eigen::Matrix4f ortho = GetOrthoProjection(
-      -10, 10, -10, 10, scene.camera->far_plane, scene.camera->near_plane - 20);
+  // Eigen::Matrix4f ortho =
+  //     GetShadowProjection(dir_lights[0]->direction, *scene.camera);
+  auto ortho = GetOrthoProjection(-40, 40, -40, 40, -100, 100);
   prog->SetUniformMatrix4fv("u_map", ortho.data());
 
   deferred_lighting_prog_->DrawQuad();
@@ -252,9 +314,9 @@ void SceneRenderer::Init() {
   glDisable(GL_BLEND);
   g_buffer_ = std::make_shared<OglFramebuffer>(1920, 1080, 4);
   g_buffer_->Bind();
-  shadow_buffer_ = std::make_shared<OglFramebuffer>(2048, 2048);
+  shadow_buffer_ = std::make_shared<OglFramebuffer>(4096, 4096);
   shadow_buffer_->Bind();
-  shadow_buffer_->SetClearColor(0, 0, 0);
+  shadow_buffer_->SetClearColor(FLT_MAX, FLT_MAX, FLT_MAX);
   shadow_buffer_->GetColorAttachment(0)->SetWrapMode(GL_CLAMP_TO_BORDER);
   shadow_buffer_->GetColorAttachment(0)->SetBorder(FLT_MAX, 1, 1);
   shadow_buffer_->GetColorAttachment(0)->SetFilterMode(GL_LINEAR);

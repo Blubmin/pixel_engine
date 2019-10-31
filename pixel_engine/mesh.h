@@ -18,6 +18,9 @@ class SubMesh {
   std::vector<float> tangents;
   std::vector<float> texture_coordinates;
   uint32_t material_idx;
+
+  void ComputeNormalsAndTangents();
+  void ComputeTangents();
 };
 
 class Mesh : public Component {

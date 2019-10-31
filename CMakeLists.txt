@@ -10,6 +10,9 @@ set(build_prefix ${CMAKE_PREFIX_PATH})
 # OpenGL
 find_package(OpenGL REQUIRED)
 
+# OpenMP
+find_package(OpenMP REQUIRED)
+
 # Boost
 find_package(Boost REQUIRED filesystem)
 

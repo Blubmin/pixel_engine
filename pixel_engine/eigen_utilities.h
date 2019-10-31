@@ -2,6 +2,8 @@
 
 #include <Eigen/Geometry>
 
+#include <boost/functional/hash.hpp>
+
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
@@ -63,3 +65,16 @@ Eigen::Vector3<T> Max(const Eigen::Vector3<T>& a, const Eigen::Vector3<T>& b) {
                          MAX(a.z(), b.z()));
 }
 }  // namespace Eigen
+
+namespace std {
+template <typename T, int Rows, int Cols>
+struct hash<Eigen::Matrix<T, Rows, Cols>> {
+  size_t operator()(const Eigen::Matrix<T, Rows, Cols>& matrix) const {
+    size_t seed = 0;
+    for (size_t i = 0; i < matrix.size(); ++i) {
+      boost::hash_combine(seed, *(matrix.data() + i));
+    }
+    return seed;
+  }
+};
+}  // namespace std

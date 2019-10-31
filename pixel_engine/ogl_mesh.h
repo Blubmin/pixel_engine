@@ -15,6 +15,7 @@ class OglSubMesh : public SubMesh {
 class OglMesh : public Mesh {
  public:
   OglMesh();
+  explicit OglMesh(const Mesh& mesh);
   explicit OglMesh(std::shared_ptr<SubMesh> sub_mesh);
   ~OglMesh() override;
   void Bind() override;

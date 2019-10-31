@@ -2,6 +2,7 @@ list(APPEND SOURCE_FILES
   camera.cpp
   color.cpp
   component.cpp
+  convex_hull.cpp
   directional_light.cpp
   empty.cpp
   entity.cpp
@@ -37,6 +38,7 @@ list(APPEND HEADER_FILES
   camera.h
   color.h
   component.h
+  convex_hull.h
   directional_light.h
   eigen_utilities.h
   empty.h
@@ -83,6 +85,7 @@ target_link_libraries(pixel_engine
   gflags
   glog
   imgui_glfw_opengl3
+  OpenMP::OpenMP_CXX
 )
 
 set(PIXEL_ENGINE_HEADER_FILES "")

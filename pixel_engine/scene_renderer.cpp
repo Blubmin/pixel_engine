@@ -228,9 +228,13 @@ void SceneRenderer::RenderShadow(const Scene& scene) {
   for (auto mesh : meshes) {
     shadow_map_prog_->SetUniformMatrix4fv("u_model",
                                           mesh->GetTransform().data());
-    std::dynamic_pointer_cast<OglMesh>(mesh->mesh)->draw_materials = false;
+    for (auto ogl_mesh : mesh->GetComponents<OglMesh>()) {
+      ogl_mesh->draw_materials = false;
+    }
     mesh->Draw(*shadow_map_prog_);
-    std::dynamic_pointer_cast<OglMesh>(mesh->mesh)->draw_materials = true;
+    for (auto ogl_mesh : mesh->GetComponents<OglMesh>()) {
+      ogl_mesh->draw_materials = true;
+    }
   }
 
   // Draw Camera Meshes

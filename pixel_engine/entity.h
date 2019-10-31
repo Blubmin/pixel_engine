@@ -30,6 +30,19 @@ class Entity : public std::enable_shared_from_this<Entity> {
     return nullptr;
   }
 
+  template <typename ComponentType>
+  std::vector<std::shared_ptr<ComponentType>> GetComponents() {
+    std::vector<std::shared_ptr<ComponentType>> typed_components;
+    for (auto component : components) {
+      auto typed_component =
+          std::dynamic_pointer_cast<ComponentType, Component>(component);
+      if (typed_component != nullptr) {
+        typed_components.push_back(typed_component);
+      }
+    }
+    return typed_components;
+  }
+
   template <typename ChildType>
   std::shared_ptr<ChildType> GetChild() {
     for (auto child : children) {

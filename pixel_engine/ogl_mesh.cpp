@@ -7,6 +7,13 @@
 namespace pxl {
 OglMesh::OglMesh() : draw_materials(true), is_bound_(false) {}
 
+OglMesh::OglMesh(const Mesh& mesh) : OglMesh() {
+  sub_meshes.resize(mesh.sub_meshes.size());
+  std::copy(mesh.sub_meshes.begin(), mesh.sub_meshes.end(), sub_meshes.begin());
+  materials.resize(mesh.materials.size());
+  std::copy(mesh.materials.begin(), mesh.materials.end(), materials.begin());
+}
+
 OglMesh::OglMesh(std::shared_ptr<SubMesh> sub_mesh)
     : Mesh(sub_mesh), draw_materials(true), is_bound_(false) {}
 

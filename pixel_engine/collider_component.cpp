@@ -1,17 +1,22 @@
 #include <pixel_engine/collider_component.h>
 
+#include <pixel_engine/convex_hull.h>
 #include <pixel_engine/entity.h>
 
 namespace pxl {
 ColliderComponent::ColliderComponent(std::shared_ptr<btCollisionShape> shape,
-                                     ColliderComponent::Type collider_type)
-    : shape_(shape), collider_type_(collider_type) {}
+                                     ColliderComponent::Type collider_type,
+                                     Eigen::Vector3f offset)
+    : shape_(shape), collider_type_(collider_type), offset_(offset) {}
 
 btCollisionObject* ColliderComponent::GetCollisionObject() const {
   auto object = new btCollisionObject();
   object->setCollisionShape(shape_.get());
   object->getWorldTransform().setFromOpenGLMatrix(
       owner.lock()->GetTransform().data());
+  object->getWorldTransform().setOrigin(
+      object->getWorldTransform().getOrigin() +
+      btVector3(offset_.x(), offset_.y(), offset_.z()));
   object->setUserPointer((void*)this);
   return object;
 }
@@ -22,9 +27,10 @@ ColliderComponent::Type ColliderComponent::GetType() const {
 
 CapsuleCollider::CapsuleCollider(float radius, float height,
                                  ColliderComponent::Type collider_type)
-    : ColliderComponent(
-          std::shared_ptr<btCapsuleShape>(new btCapsuleShape(radius, height)),
-          collider_type) {}
+    : ColliderComponent(std::shared_ptr<btCapsuleShape>(
+                            new btCapsuleShape(radius, height - radius * 2)),
+                        collider_type,
+                        Eigen::Vector3f::UnitY() * (height / 2.f)) {}
 
 BoxCollider::BoxCollider(const Eigen::Vector3f& half_extents,
                          ColliderComponent::Type collider_type)
@@ -32,4 +38,20 @@ BoxCollider::BoxCollider(const Eigen::Vector3f& half_extents,
           std::shared_ptr<btBoxShape>(new btBoxShape(
               btVector3(half_extents.x(), half_extents.y(), half_extents.z()))),
           collider_type) {}
+
+HullCollider::HullCollider(const Mesh& mesh,
+                           ColliderComponent::Type collider_type)
+    : ColliderComponent(std::shared_ptr<btCompoundShape>(new btCompoundShape()),
+                        collider_type) {
+  auto compound = std::static_pointer_cast<btCompoundShape>(shape_);
+  auto hull = ConvexHull(&mesh);
+  for (auto mesh : hull.sub_meshes) {
+    auto bt_convex = new btConvexHullShape();
+    for (size_t i = 0; i < mesh->positions.size(); i += 3) {
+      bt_convex->addPoint(btVector3(mesh->positions[i], mesh->positions[i + 1],
+                                    mesh->positions[i + 2]));
+    }
+    compound->addChildShape(btTransform::getIdentity(), bt_convex);
+  }
+}
 }  // namespace pxl

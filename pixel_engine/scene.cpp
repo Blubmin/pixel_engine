@@ -4,14 +4,27 @@
 #include <glog/logging.h>
 
 #include <pixel_engine/collider_component.h>
+#include <pixel_engine/physics_component.h>
 
 namespace pxl {
 namespace {
 const int kGridSize = 10;
-}
+const float kAcceleration = -9.8;
+}  // namespace
 void Scene::Update(float time_elapsed) {
   for (auto entity : entities) {
     entity->Update(time_elapsed);
+    auto physics = entity->GetComponent<PhysicsComponent>();
+    if (physics == nullptr) {
+      continue;
+    }
+    physics->velocity +=
+        Eigen::Vector3f::UnitY() * kAcceleration * time_elapsed;
+    entity->position += physics->velocity * time_elapsed;
+    if (entity->position.y() < 0) {
+      entity->position.y() = 0;
+      physics->velocity = Eigen::Vector3f::Zero();
+    }
   }
 
   // Bullet collision handling
@@ -53,6 +66,7 @@ void Scene::Update(float time_elapsed) {
       auto translation_vec = pt.m_normalWorldOnB * pt.getDistance();
       collider2->owner.lock()->position += Eigen::Vector3f(
           translation_vec.x(), translation_vec.y(), translation_vec.z());
+
     } else if (type1 == ColliderComponent::kDynamic &&
                type2 == ColliderComponent::kStatic) {
       auto translation_vec = pt.m_normalWorldOnB * pt.getDistance();
@@ -69,6 +83,21 @@ void Scene::Update(float time_elapsed) {
           (Eigen::Vector3f(translation_vec.x(), translation_vec.y(),
                            translation_vec.z()) /
            2);
+    }
+
+    auto physics = collider1->owner.lock()->GetComponent<PhysicsComponent>();
+    if (physics != nullptr &&
+        physics->velocity.dot(Eigen::Vector3f(pt.m_normalWorldOnB.x(),
+                                              pt.m_normalWorldOnB.y(),
+                                              pt.m_normalWorldOnB.z())) > 0) {
+      physics->velocity.y() = 0;
+    }
+    physics = collider2->owner.lock()->GetComponent<PhysicsComponent>();
+    if (physics != nullptr &&
+        physics->velocity.dot(Eigen::Vector3f(pt.m_normalWorldOnB.x(),
+                                              pt.m_normalWorldOnB.y(),
+                                              pt.m_normalWorldOnB.z())) > 0) {
+      physics->velocity.y() = 0;
     }
   }
 

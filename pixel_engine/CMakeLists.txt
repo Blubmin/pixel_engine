@@ -24,6 +24,7 @@ list(APPEND SOURCE_FILES
   ogl_texture2d.cpp
   ogl_texture_renderer.cpp
   ogl_utilities.cpp
+  physics_component.cpp
   program.cpp
   point_light.cpp
   scene.cpp
@@ -62,6 +63,7 @@ list(APPEND HEADER_FILES
   ogl_texture2d.h
   ogl_texture_renderer.h
   ogl_utilities.h
+  physics_component.h
   program.h
   point_light.h
   scene.h

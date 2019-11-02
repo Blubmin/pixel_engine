@@ -1,5 +1,10 @@
 #include <pixel_engine/scene.h>
 
+#include <btBulletCollisionCommon.h>
+#include <glog/logging.h>
+
+#include <pixel_engine/collider_component.h>
+
 namespace pxl {
 namespace {
 const int kGridSize = 10;
@@ -8,6 +13,69 @@ void Scene::Update(float time_elapsed) {
   for (auto entity : entities) {
     entity->Update(time_elapsed);
   }
+
+  // Bullet collision handling
+  auto config = new btDefaultCollisionConfiguration();
+  auto dispatcher = new btCollisionDispatcher(config);
+  btVector3 world_min(-500, -500, -500);
+  btVector3 world_max(500, 500, 500);
+  auto broad =
+      new bt32BitAxisSweep3(world_min, world_max, entities.size(), 0, true);
+  auto world = new btCollisionWorld(dispatcher, broad, config);
+
+  for (auto entity : entities) {
+    auto collider = entity->GetComponent<ColliderComponent>();
+    if (collider == nullptr) {
+      continue;
+    }
+    auto object = collider->GetCollisionObject();
+    world->addCollisionObject(object);
+  }
+  world->performDiscreteCollisionDetection();
+
+  auto num_manifolds = world->getDispatcher()->getNumManifolds();
+
+  for (int i = 0; i < num_manifolds; ++i) {
+    auto manifold = world->getDispatcher()->getManifoldByIndexInternal(i);
+    if (manifold->getNumContacts() != 1) {
+      continue;
+    }
+    auto pt = manifold->getContactPoint(0);
+    auto object1 = manifold->getBody0();
+    auto collider1 = (ColliderComponent*)object1->getUserPointer();
+    auto type1 = collider1->GetType();
+    auto object2 = manifold->getBody1();
+    auto collider2 = (ColliderComponent*)object2->getUserPointer();
+    auto type2 = collider2->GetType();
+
+    if (type1 == ColliderComponent::kStatic &&
+        type2 == ColliderComponent::kDynamic) {
+      auto translation_vec = pt.m_normalWorldOnB * pt.getDistance();
+      collider2->owner.lock()->position += Eigen::Vector3f(
+          translation_vec.x(), translation_vec.y(), translation_vec.z());
+    } else if (type1 == ColliderComponent::kDynamic &&
+               type2 == ColliderComponent::kStatic) {
+      auto translation_vec = pt.m_normalWorldOnB * pt.getDistance();
+      collider1->owner.lock()->position -= Eigen::Vector3f(
+          translation_vec.x(), translation_vec.y(), translation_vec.z());
+    } else if (type1 == ColliderComponent::kDynamic &&
+               type2 == ColliderComponent::kDynamic) {
+      auto translation_vec = pt.m_normalWorldOnB * pt.getDistance();
+      collider1->owner.lock()->position -=
+          (Eigen::Vector3f(translation_vec.x(), translation_vec.y(),
+                           translation_vec.z()) /
+           2);
+      collider2->owner.lock()->position +=
+          (Eigen::Vector3f(translation_vec.x(), translation_vec.y(),
+                           translation_vec.z()) /
+           2);
+    }
+  }
+
+  delete world;
+  delete broad;
+  delete dispatcher;
+  delete config;
 }
 
 void Scene::Bind() {

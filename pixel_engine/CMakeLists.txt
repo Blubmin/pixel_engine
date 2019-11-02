@@ -1,6 +1,7 @@
 list(APPEND SOURCE_FILES
   camera.cpp
   color.cpp
+  collider_component.cpp
   component.cpp
   convex_hull.cpp
   directional_light.cpp
@@ -37,6 +38,7 @@ list(APPEND SOURCE_FILES
 list(APPEND HEADER_FILES
   camera.h
   color.h
+  collider_component.h
   component.h
   convex_hull.h
   directional_light.h
@@ -77,6 +79,7 @@ add_library(pixel_engine
 )
 
 target_link_libraries(pixel_engine
+  ${Bullet}
   ${OPENGL_LIBRRIES}
   assimp
   Boost::filesystem

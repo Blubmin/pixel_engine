@@ -25,3 +25,13 @@ add_subdirectory(assimp)
 
 # ImGui
 add_subdirectory(imgui)
+
+# Bullet
+set(BUILD_UNIT_TESTS OFF)
+set(BUILD_CPU_DEMOS OFF)
+set(BUILD_OPENGL3_DEMOS OFF)
+set(BUILD_BULLET2_DEMOS OFF)
+set(BUILD_EXTRAS OFF)
+set(BUILD_ENET OFF)
+set(BUILD_CLSOCKET OFF)
+add_subdirectory(bullet3)

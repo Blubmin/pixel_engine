@@ -69,7 +69,7 @@ float inv_shadow() {
 		return 1;
 	}
 	float shadow_depth = texture2D(u_shadow_texture, shadow_uv.xy).r;
-	float bias = max(.05 * (1.0 - dot(normal, -u_dir_light.direction)), 0.005);
+	float bias = max(.05 * (1.0 - dot(normal, -u_dir_light.direction)), 0.04);
 	float shadow = 0.0;
 	vec2 texel_size = 1.0 / textureSize(u_shadow_texture, 0);
 

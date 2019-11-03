@@ -317,6 +317,7 @@ void SceneRenderer::RenderDeferredLighting(const Scene& scene, float gamma) {
 void SceneRenderer::Init() {
   glDisable(GL_BLEND);
   g_buffer_ = std::make_shared<OglFramebuffer>(1920, 1080, 4);
+  g_buffer_->SetAttachmentClearColor(1, FLT_MAX, FLT_MAX, FLT_MAX);
   g_buffer_->Bind();
   shadow_buffer_ = std::make_shared<OglFramebuffer>(4096, 4096);
   shadow_buffer_->Bind();

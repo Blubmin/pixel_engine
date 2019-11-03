@@ -6,19 +6,21 @@
 #include <pixel_engine/ogl_utilities.h>
 
 namespace pxl {
+namespace {
+const std::array<float, 4> kDefaultClear = {.15f, .15f, .15f, 1.f};
+}
+
 OglFramebuffer::OglFramebuffer(uint32_t width, uint32_t height,
                                uint32_t color_attachments)
-    : width_(width),
-      height_(height),
-      clear_color_({.15, .15, .15, 1}),
-      prev_clear_color_(4) {
+    : width_(width), height_(height), prev_clear_color_(4) {
   for (uint32_t i = 0; i < color_attachments; ++i) {
     color_attachments_.emplace(
         i, std::make_shared<OglTexture2d>(width_, height_, Texture2d::FLOAT));
+    clear_colors_.emplace(i, kDefaultClear);
   }
   depth_stencil_attachment_ =
       std::make_shared<OglTexture2d>(width_, height_, Texture2d::DEPTH_STENCIL);
-}
+}  // namespace pxl
 
 OglFramebuffer::~OglFramebuffer() { glDeleteFramebuffers(1, &framebuffer_id_); }
 
@@ -55,18 +57,33 @@ void OglFramebuffer::Bind() {
 }
 
 void OglFramebuffer::SetClearColor(float r, float g, float b, float a) {
-  clear_color_[0] = r;
-  clear_color_[1] = g;
-  clear_color_[2] = b;
-  clear_color_[3] = a;
+  for (auto& pair : clear_colors_) {
+    auto& clear_color = pair.second;
+    clear_color[0] = r;
+    clear_color[1] = g;
+    clear_color[2] = b;
+    clear_color[3] = a;
+  }
+}
+
+void OglFramebuffer::SetAttachmentClearColor(uint32_t attachment, float r,
+                                             float g, float b, float a) {
+  auto& clear_color = clear_colors_[attachment];
+  clear_color[0] = r;
+  clear_color[1] = g;
+  clear_color[2] = b;
+  clear_color[3] = a;
 }
 
 void OglFramebuffer::Begin() {
   glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id_);
   glViewport(0, 0, width_, height_);
-  glClearColor(clear_color_[0], clear_color_[1], clear_color_[2],
-               clear_color_[3]);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+  // glClearColor(clear_color_[0], clear_color_[1], clear_color_[2],
+  //             clear_color_[3]);
+  for (const auto pair : clear_colors_) {
+    glClearBufferfv(GL_COLOR, pair.first, pair.second.data());
+  }
+  glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void OglFramebuffer::End() {

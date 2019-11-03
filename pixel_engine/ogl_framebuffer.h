@@ -19,6 +19,8 @@ class OglFramebuffer {
   void Bind();
 
   void SetClearColor(float r, float g, float b, float a = 1);
+  void SetAttachmentClearColor(uint32_t attachent, float r, float g, float b,
+                               float a = 1);
 
   void Begin();
   void End();
@@ -35,7 +37,7 @@ class OglFramebuffer {
   uint32_t height_;
   std::map<uint32_t, std::shared_ptr<OglTexture2d>> color_attachments_;
   std::shared_ptr<OglTexture2d> depth_stencil_attachment_;
-  std::vector<float> clear_color_;
+  std::map<uint32_t, std::array<float, 4>> clear_colors_;
 
   GLint prev_framebuffer_id_;
   int32_t prev_viewport_[4];

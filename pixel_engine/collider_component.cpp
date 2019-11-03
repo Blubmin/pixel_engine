@@ -54,4 +54,20 @@ HullCollider::HullCollider(const Mesh& mesh,
     compound->addChildShape(btTransform::getIdentity(), bt_convex);
   }
 }
+
+CombinedHullCollider::CombinedHullCollider(
+    const Mesh& mesh, ColliderComponent::Type collider_type)
+    : ColliderComponent(
+          std::shared_ptr<btConvexHullShape>(new btConvexHullShape()),
+          collider_type) {
+  auto bt_convex = std::static_pointer_cast<btConvexHullShape>(shape_);
+  auto hull = ConvexHull(&mesh);
+  for (auto mesh : hull.sub_meshes) {
+    for (size_t i = 0; i < mesh->positions.size(); i += 3) {
+      bt_convex->addPoint(btVector3(mesh->positions[i], mesh->positions[i + 1],
+                                    mesh->positions[i + 2]));
+    }
+  }
+  bt_convex->optimizeConvexHull();
+}
 }  // namespace pxl

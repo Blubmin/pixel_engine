@@ -1,5 +1,8 @@
 #include <pixel_engine/scene.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include <btBulletCollisionCommon.h>
 #include <glog/logging.h>
 
@@ -51,6 +54,8 @@ void Scene::Update(float time_elapsed) {
   for (int i = 0; i < num_manifolds; ++i) {
     auto manifold = world->getDispatcher()->getManifoldByIndexInternal(i);
     if (manifold->getNumContacts() != 1) {
+      LOG_IF(INFO, manifold->getNumContacts() != 0)
+          << manifold->getNumContacts();
       continue;
     }
     auto pt = manifold->getContactPoint(0);
@@ -61,42 +66,87 @@ void Scene::Update(float time_elapsed) {
     auto collider2 = (ColliderComponent*)object2->getUserPointer();
     auto type2 = collider2->GetType();
 
-    if (type1 == ColliderComponent::kStatic &&
-        type2 == ColliderComponent::kDynamic) {
-      auto translation_vec = pt.m_normalWorldOnB * pt.getDistance();
-      collider2->owner.lock()->position += Eigen::Vector3f(
-          translation_vec.x(), translation_vec.y(), translation_vec.z());
+    auto translation_vec = pt.m_normalWorldOnB * pt.getDistance();
+    auto angle = std::abs(translation_vec.y());
+    auto limit = std::cos(46 * M_PI / 180.f);  // Set slope limit to 46 degrees
+    if (angle > limit) {
+      translation_vec.setY(0);
 
-    } else if (type1 == ColliderComponent::kDynamic &&
-               type2 == ColliderComponent::kStatic) {
-      auto translation_vec = pt.m_normalWorldOnB * pt.getDistance();
-      collider1->owner.lock()->position -= Eigen::Vector3f(
-          translation_vec.x(), translation_vec.y(), translation_vec.z());
-    } else if (type1 == ColliderComponent::kDynamic &&
-               type2 == ColliderComponent::kDynamic) {
-      auto translation_vec = pt.m_normalWorldOnB * pt.getDistance();
-      collider1->owner.lock()->position -=
-          (Eigen::Vector3f(translation_vec.x(), translation_vec.y(),
-                           translation_vec.z()) /
-           2);
-      collider2->owner.lock()->position +=
-          (Eigen::Vector3f(translation_vec.x(), translation_vec.y(),
-                           translation_vec.z()) /
-           2);
+      if (type1 == ColliderComponent::kStatic &&
+          type2 == ColliderComponent::kDynamic) {
+        collider2->owner.lock()->position += Eigen::Vector3f(
+            translation_vec.x(), translation_vec.y(), translation_vec.z());
+
+      } else if (type1 == ColliderComponent::kDynamic &&
+                 type2 == ColliderComponent::kStatic) {
+        collider1->owner.lock()->position -= Eigen::Vector3f(
+            translation_vec.x(), translation_vec.y(), translation_vec.z());
+      } else if (type1 == ColliderComponent::kDynamic &&
+                 type2 == ColliderComponent::kDynamic) {
+        collider1->owner.lock()->position -=
+            (Eigen::Vector3f(translation_vec.x(), translation_vec.y(),
+                             translation_vec.z()) /
+             2);
+        collider2->owner.lock()->position +=
+            (Eigen::Vector3f(translation_vec.x(), translation_vec.y(),
+                             translation_vec.z()) /
+             2);
+      }
+    } else {
+      if (type1 == ColliderComponent::kStatic &&
+          type2 == ColliderComponent::kDynamic) {
+        auto from = object2->getWorldTransform().getOrigin();
+        auto to =
+            object2->getWorldTransform().getOrigin() - btVector3(0, 100, 0);
+        auto cb = btCollisionWorld::AllHitsRayResultCallback(from, to);
+        world->rayTest(from, to, cb);
+        for (int i = 0; i < cb.m_collisionObjects.size(); ++i) {
+          const auto obj = cb.m_collisionObjects[i];
+          if (obj == object2) {
+            continue;
+          }
+          auto hit_pt = from + (to - from) * cb.m_hitFractions[i];
+          collider2->owner.lock()->position =
+              Eigen::Vector3f(hit_pt.x(), hit_pt.y(), hit_pt.z());
+          break;
+        }
+      } else if (type1 == ColliderComponent::kDynamic &&
+                 type2 == ColliderComponent::kStatic) {
+        auto from = object1->getWorldTransform().getOrigin();
+        auto to =
+            object1->getWorldTransform().getOrigin() - btVector3(0, 100, 0);
+        auto cb = btCollisionWorld::AllHitsRayResultCallback(from, to);
+        world->rayTest(from, to, cb);
+        for (int i = 0; i < cb.m_collisionObjects.size(); ++i) {
+          const auto obj = cb.m_collisionObjects[i];
+          if (obj == object1) {
+            continue;
+          }
+          auto hit_pt = from + (to - from) * cb.m_hitFractions[i];
+          collider1->owner.lock()->position =
+              Eigen::Vector3f(hit_pt.x(), hit_pt.y(), hit_pt.z());
+          break;
+        }
+      } else if (type1 == ColliderComponent::kDynamic &&
+                 type2 == ColliderComponent::kDynamic) {
+        collider1->owner.lock()->position -=
+            (Eigen::Vector3f(translation_vec.x(), translation_vec.y(),
+                             translation_vec.z()) /
+             2);
+        collider2->owner.lock()->position +=
+            (Eigen::Vector3f(translation_vec.x(), translation_vec.y(),
+                             translation_vec.z()) /
+             2);
+      }
     }
 
     auto physics = collider1->owner.lock()->GetComponent<PhysicsComponent>();
-    if (physics != nullptr &&
-        physics->velocity.dot(Eigen::Vector3f(pt.m_normalWorldOnB.x(),
-                                              pt.m_normalWorldOnB.y(),
-                                              pt.m_normalWorldOnB.z())) > 0) {
+    if (physics != nullptr && btVector3(0, 1, 0).dot(pt.m_normalWorldOnB) > 0) {
       physics->velocity.y() = 0;
     }
     physics = collider2->owner.lock()->GetComponent<PhysicsComponent>();
     if (physics != nullptr &&
-        physics->velocity.dot(Eigen::Vector3f(pt.m_normalWorldOnB.x(),
-                                              pt.m_normalWorldOnB.y(),
-                                              pt.m_normalWorldOnB.z())) > 0) {
+        btVector3(0, 1, 0).dot(-pt.m_normalWorldOnB) > 0) {
       physics->velocity.y() = 0;
     }
   }

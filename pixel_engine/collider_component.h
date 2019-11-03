@@ -43,4 +43,9 @@ class HullCollider : public ColliderComponent {
  public:
   HullCollider(const Mesh& mesh, ColliderComponent::Type collider_type);
 };
+
+class CombinedHullCollider : public ColliderComponent {
+ public:
+  CombinedHullCollider(const Mesh& mesh, ColliderComponent::Type collider_type);
+};
 }  // namespace pxl

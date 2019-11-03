@@ -9,6 +9,7 @@
 #include <pixel_engine/camera.h>
 #include <pixel_engine/entity.h>
 #include <pixel_engine/game.h>
+#include <pixel_engine/physics_component.h>
 
 #define CLAMP(A, T, B) ((T) < (A) ? (A) : (T) > (B) ? (B) : (T))
 
@@ -25,6 +26,13 @@ void FpsController::Update(float time_elapsed) {
   }
   Rotate();
   owner_ptr->position += GetMovementVector() * speed * time_elapsed;
+
+  auto physics = owner_ptr->GetComponent<PhysicsComponent>();
+  if (ImGui::IsKeyPressed(GLFW_KEY_SPACE) && physics != nullptr) {
+    if (physics->velocity.y() == 0) {
+      physics->velocity.y() = 6.f;
+    }
+  }
 }
 
 void FpsController::Rotate() {

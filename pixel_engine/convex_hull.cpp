@@ -133,7 +133,6 @@ ConvexHull::ConvexHull(const Mesh* mesh) {
 // mesh
 std::shared_ptr<SubMesh> ConvexHull::QuickHull(const SubMesh& mesh) {
   std::shared_ptr<SubMesh> sub_mesh = std::make_shared<SubMesh>();
-  LOG(INFO) << "Start";
 
   // Convert loose floats into vertices
   std::unordered_set<Eigen::Vector3f> verticies;
@@ -207,8 +206,6 @@ std::shared_ptr<SubMesh> ConvexHull::QuickHull(const SubMesh& mesh) {
   worklist.push(f2);
   worklist.push(f3);
   worklist.push(f4);
-
-  LOG(INFO) << "Init";
 
   // Iterate through each face, expanding the final result as you go
   while (!worklist.empty()) {
@@ -306,7 +303,6 @@ std::shared_ptr<SubMesh> ConvexHull::QuickHull(const SubMesh& mesh) {
     sub_mesh->triangles.push_back(sub_mesh->triangles.size());
     sub_mesh->triangles.push_back(sub_mesh->triangles.size());
   }
-  LOG(INFO) << "Done";
   sub_mesh->material_idx = mesh.material_idx;
   return sub_mesh;
 }

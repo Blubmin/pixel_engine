@@ -113,7 +113,7 @@ vec3 compute_point_light(PointLight light) {
 	vec3 light_vec = normalize(light.pos - pos);
     vec3 half_vec = normalize(light_vec + view_vec);
     vec3 diffuse = max(dot(light_vec, normal), 0) * albedo;
-	vec3 specular = pow(max(dot(half_vec, normal), 0), shininess) * vec3(1);
+	vec3 specular = pow(max(dot(half_vec, normal), 0), shininess) * vec3(.5);
 
     float dist = length(light.pos - pos);
     float attenuation = 1 / (1 + light.linear_attenuation * dist + light.quadratic_attenuation * dist * dist);
@@ -125,7 +125,7 @@ vec3 compute_directional_light() {
 	vec3 light_vec = -normalize(u_dir_light.direction);
 	vec3 half_vec = normalize(light_vec + view_vec);
     vec3 diffuse = max(dot(light_vec, normal), 0) * albedo;
-	vec3 specular = pow(max(dot(half_vec, normal), 0), shininess) * vec3(1);
+	vec3 specular = pow(max(dot(half_vec, normal), 0), shininess) * vec3(.5);
 
     return (diffuse + specular) * u_dir_light.color * u_dir_light.strength * inv_shadow();
 }

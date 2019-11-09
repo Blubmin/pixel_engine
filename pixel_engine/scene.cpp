@@ -54,8 +54,6 @@ void Scene::Update(float time_elapsed) {
   for (int i = 0; i < num_manifolds; ++i) {
     auto manifold = world->getDispatcher()->getManifoldByIndexInternal(i);
     if (manifold->getNumContacts() != 1) {
-      LOG_IF(INFO, manifold->getNumContacts() != 0)
-          << manifold->getNumContacts();
       continue;
     }
     auto pt = manifold->getContactPoint(0);
@@ -66,10 +64,11 @@ void Scene::Update(float time_elapsed) {
     auto collider2 = (ColliderComponent*)object2->getUserPointer();
     auto type2 = collider2->GetType();
 
-    auto translation_vec = pt.m_normalWorldOnB * pt.getDistance();
-    auto angle = std::abs(translation_vec.y());
+    auto translation_vec = pt.m_normalWorldOnB.normalized() * pt.getDistance();
+    auto angle = std::abs(btVector3(0, pt.m_normalWorldOnB.y() > 0 ? 1 : -1, 0)
+                              .dot(pt.m_normalWorldOnB));
     auto limit = std::cos(46 * M_PI / 180.f);  // Set slope limit to 46 degrees
-    if (angle > limit) {
+    if (angle < limit) {
       translation_vec.setY(0);
 
       if (type1 == ColliderComponent::kStatic &&

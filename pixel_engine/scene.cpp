@@ -140,12 +140,15 @@ void Scene::Update(float time_elapsed) {
     }
 
     auto physics = collider1->owner.lock()->GetComponent<PhysicsComponent>();
-    if (physics != nullptr && btVector3(0, 1, 0).dot(pt.m_normalWorldOnB) > 0) {
+    if (physics != nullptr &&
+        (btVector3(0, 1, 0).dot(pt.m_normalWorldOnB) > .707 ||
+         btVector3(0, 1, 0).dot(-pt.m_normalWorldOnB) > .707)) {
       physics->velocity.y() = 0;
     }
     physics = collider2->owner.lock()->GetComponent<PhysicsComponent>();
     if (physics != nullptr &&
-        btVector3(0, 1, 0).dot(-pt.m_normalWorldOnB) > 0) {
+        (btVector3(0, 1, 0).dot(-pt.m_normalWorldOnB) > .707 ||
+         btVector3(0, 1, 0).dot(-pt.m_normalWorldOnB) > .707)) {
       physics->velocity.y() = 0;
     }
   }

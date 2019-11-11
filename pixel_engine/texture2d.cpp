@@ -25,11 +25,12 @@ Texture2d::Texture2d(const boost::filesystem::path& path) : format(FLOAT) {
   }
 }
 
-Texture2d::Texture2d(int32_t width, int32_t height, Texture2d::Format format)
+Texture2d::Texture2d(int32_t width, int32_t height, Texture2d::Format format,
+                     int32_t channels)
     : image_data(NULL),
       width(width),
       height(height),
-      channels(4),
+      channels(channels),
       format(format) {}
 
 int32_t Texture2d::GetWidth() const { return width; }

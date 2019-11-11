@@ -20,7 +20,20 @@ OglFramebuffer::OglFramebuffer(uint32_t width, uint32_t height,
   }
   depth_stencil_attachment_ =
       std::make_shared<OglTexture2d>(width_, height_, Texture2d::DEPTH_STENCIL);
-}  // namespace pxl
+}
+
+OglFramebuffer::OglFramebuffer(uint32_t width, uint32_t height,
+                               const std::vector<int32_t>& attachment_channels)
+    : width_(width), height_(height), prev_clear_color_(4) {
+  for (uint32_t i = 0; i < attachment_channels.size(); ++i) {
+    color_attachments_.emplace(
+        i, std::make_shared<OglTexture2d>(width_, height_, Texture2d::FLOAT,
+                                          attachment_channels[i]));
+    clear_colors_.emplace(i, kDefaultClear);
+  }
+  depth_stencil_attachment_ =
+      std::make_shared<OglTexture2d>(width_, height_, Texture2d::DEPTH_STENCIL);
+}
 
 OglFramebuffer::~OglFramebuffer() { glDeleteFramebuffers(1, &framebuffer_id_); }
 
@@ -78,8 +91,6 @@ void OglFramebuffer::SetAttachmentClearColor(uint32_t attachment, float r,
 void OglFramebuffer::Begin() {
   glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id_);
   glViewport(0, 0, width_, height_);
-  // glClearColor(clear_color_[0], clear_color_[1], clear_color_[2],
-  //             clear_color_[3]);
   for (const auto pair : clear_colors_) {
     glClearBufferfv(GL_COLOR, pair.first, pair.second.data());
   }

@@ -81,8 +81,8 @@ GLenum GetDataType(Texture2d::Format format) {
 }
 }  // namespace
 OglTexture2d::OglTexture2d(int32_t width, int32_t height,
-                           Texture2d::Format format)
-    : Texture2d(width, height, format) {}
+                           Texture2d::Format format, int32_t channels)
+    : Texture2d(width, height, format, channels) {}
 
 OglTexture2d::OglTexture2d(float* data, int32_t width, int32_t height,
                            int32_t channels)

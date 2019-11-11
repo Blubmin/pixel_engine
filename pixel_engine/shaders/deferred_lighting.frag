@@ -23,7 +23,7 @@ uniform mat4 u_map;
 const float c_gaussian[5] = {0.06136, .24477, .38774, .24477, .06136};
 const float c_gaussian_3[3] = {0.27901, .44198, .27901};
 
-const float c_gaussain_7[7] = {0.00598, 0.060626,	0.241843, 0.383103, 0.241843, 0.060626, 0.00598};
+const float c_gaussian_7[7] = {0.00598, 0.060626,	0.241843, 0.383103, 0.241843, 0.060626, 0.00598};
 
 vec2 c_poisson_disk[16] = vec2[]( 
    vec2( -0.94201624, -0.39906216 ), 
@@ -70,6 +70,7 @@ float inv_shadow() {
 	}
 	float shadow_depth = texture2D(u_shadow_texture, shadow_uv.xy).r;
 	float bias = max(.05 * (1.0 - dot(normal, -u_dir_light.direction)), 0.04);
+	bias = 0;
 	float shadow = 0.0;
 	vec2 texel_size = 1.0 / textureSize(u_shadow_texture, 0);
 
@@ -82,13 +83,13 @@ float inv_shadow() {
 //		}    
 //	}
 
-//	for(int x = -4; x <= 4; ++x) {
-//		for(int y = -4; y <= 4; ++y) {
+//	for(int x = -2; x <= 2; ++x) {
+//		for(int y = -2; y <= 2; ++y) {
 //			float depth = texture2D(u_shadow_texture, shadow_uv.xy + vec2(x, y) * texel_size).r; 
 //			shadow += (-pos_in_light.z - (bias)) > depth ? 1.0 : 0.0;        
 //		}    
 //	}
-//	shadow /= 81;
+//	shadow /= 25;
 
 //	for(int x = -1; x <= 1; ++x) {
 //		for(int y = -1; y <= 1; ++y) {
@@ -102,9 +103,13 @@ float inv_shadow() {
 		for(int y = -3; y <= 3; ++y)
 		{
 			float depth = texture(u_shadow_texture, shadow_uv.xy + vec2(x, y) * texel_size).r; 
-			shadow += (-pos_in_light.z - bias) > depth ? c_gaussian[x + 3] * c_gaussian[y + 3] : 0.0;        
+			shadow += (-pos_in_light.z - bias) > depth ? c_gaussian_7[x + 3] * c_gaussian_7[y + 3] : 0.0;        
 		}    
 	}
+
+//	if (-pos_in_light.z - bias > texture(u_shadow_texture, shadow_uv.xy).r) {
+//		shadow = 1;
+//	}
 
 	return 1 - shadow;
 }

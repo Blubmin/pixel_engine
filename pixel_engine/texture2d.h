@@ -13,7 +13,7 @@ class Texture2d {
   Texture2d();
   Texture2d(const boost::filesystem::path& path);
   Texture2d(float* data, int32_t width, int32_t height, int32_t channels);
-  Texture2d(int32_t width, int32_t height, Format format);
+  Texture2d(int32_t width, int32_t height, Format format, int32_t channels = 4);
   virtual ~Texture2d() {}
 
   virtual void Bind(){};

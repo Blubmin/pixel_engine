@@ -14,6 +14,8 @@ class OglFramebuffer {
  public:
   OglFramebuffer(uint32_t width, uint32_t height,
                  uint32_t color_attachments = 1);
+  OglFramebuffer(uint32_t width, uint32_t height,
+                 const std::vector<int32_t>& attachment_channels);
   ~OglFramebuffer();
 
   void Bind();

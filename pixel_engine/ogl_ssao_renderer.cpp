@@ -87,7 +87,8 @@ std::shared_ptr<OglSsaoRenderer> OglSsaoRenderer::GetInstance() {
   instance->noise_->SetWrapMode(GL_REPEAT);
 
   // Create ssao framebuffer
-  instance->ssao_framebuffer_ = std::make_shared<OglFramebuffer>(1920, 1080);
+  instance->ssao_framebuffer_ =
+      std::make_shared<OglFramebuffer>(1920, 1080, std::vector<int32_t>({1}));
   instance->ssao_framebuffer_->Bind();
   instance->ssao_framebuffer_->SetClearColor(0, 0, 0, 1);
 

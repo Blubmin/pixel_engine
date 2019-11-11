@@ -319,13 +319,17 @@ void SceneRenderer::Init() {
   g_buffer_ = std::make_shared<OglFramebuffer>(1920, 1080, 4);
   g_buffer_->SetAttachmentClearColor(1, FLT_MAX, FLT_MAX, FLT_MAX);
   g_buffer_->Bind();
-  shadow_buffer_ = std::make_shared<OglFramebuffer>(4096, 4096);
+  GLint tex_size = 0;
+  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tex_size);
+  shadow_buffer_ = std::make_shared<OglFramebuffer>(1 << 13, 1 << 13,
+                                                    std::vector<int32_t>({1}));
   shadow_buffer_->Bind();
   shadow_buffer_->SetClearColor(FLT_MAX, FLT_MAX, FLT_MAX);
   shadow_buffer_->GetColorAttachment(0)->SetWrapMode(GL_CLAMP_TO_BORDER);
   shadow_buffer_->GetColorAttachment(0)->SetBorder(FLT_MAX, 1, 1);
   shadow_buffer_->GetColorAttachment(0)->SetFilterMode(GL_LINEAR);
-  ssao_buffer_ = std::make_shared<OglFramebuffer>(1920, 1080);
+  ssao_buffer_ =
+      std::make_shared<OglFramebuffer>(1920, 1080, std::vector<int32_t>({1}));
   ssao_buffer_->Bind();
   mesh_prog_ = std::make_shared<Program>(
       boost::filesystem::path(__FILE__).parent_path() / "shaders" / "mesh.vert",

@@ -10,8 +10,10 @@
 namespace pxl {
 class OglTexture2d : public Texture2d {
  public:
-  OglTexture2d(int32_t width, int32_t height, Format format);
-  OglTexture2d(float* data, int32_t width, int32_t height, int32_t channels);
+  OglTexture2d(int32_t width, int32_t height, Format format,
+               int32_t channels = 4);
+  OglTexture2d(float* data, int32_t width, int32_t height,
+               int32_t channels = 4);
   OglTexture2d(const boost::filesystem::path& path);
   ~OglTexture2d() override;
 

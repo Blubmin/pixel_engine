@@ -41,7 +41,7 @@ Game::Game(const std::string &game_name) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
   State.window =
-      glfwCreateWindow(1280, 720, State.game_name.c_str(), NULL, NULL);
+      glfwCreateWindow(1920, 1080, State.game_name.c_str(), NULL, NULL);
   if (State.window == nullptr) {
     CHECK(false) << "glfwCreateWindow failed.";
   }

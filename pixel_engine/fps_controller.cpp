@@ -14,7 +14,7 @@
 #define CLAMP(A, T, B) ((T) < (A) ? (A) : (T) > (B) ? (B) : (T))
 
 namespace pxl {
-FpsController::FpsController() : speed(5), disable(false) {}
+FpsController::FpsController() : speed(4), disable(false) {}
 
 void FpsController::Update(float time_elapsed) {
   if (disable) {
@@ -28,6 +28,9 @@ void FpsController::Update(float time_elapsed) {
   owner_ptr->position += GetMovementVector() * speed * time_elapsed;
 
   auto physics = owner_ptr->GetComponent<PhysicsComponent>();
+  physics->velocity.x() = 0;
+  physics->velocity.z() = 0;
+  physics->velocity += GetMovementVector() * speed;
   if (ImGui::IsKeyPressed(GLFW_KEY_SPACE) && physics != nullptr) {
     if (physics->velocity.y() == 0) {
       physics->velocity.y() = 6.f;

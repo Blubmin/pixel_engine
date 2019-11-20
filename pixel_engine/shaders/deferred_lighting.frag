@@ -52,7 +52,7 @@ float shininess;
 vec3 view_vec;
 
 // Output
-out vec3 final_color;
+out vec4 final_color;
 
 
 float random(vec3 seed, int i) {
@@ -145,13 +145,14 @@ void main() {
 	vec3 ambient = albedo * ssao * .3;
 	view_vec = normalize(u_camera_pos - pos);
 
-	final_color = ambient;
+	final_color.rgb = ambient;
 	for (int i = 0; i < u_num_point_lights; ++i) {
-		final_color += compute_point_light(u_point_lights[i]);
+		final_color.rgb += compute_point_light(u_point_lights[i]);
 	}
 
-	final_color += compute_directional_light();
-	final_color = pow(final_color, vec3(1 / u_gamma));
+	final_color.rgb += compute_directional_light();
+	final_color.rgb = pow(final_color.rgb, vec3(1 / u_gamma));
+	final_color.a = clamp(length(u_camera_pos - pos), 0, 1);
 
 	// vec4 pos_in_light = u_shadow * vec4(pos, 1);
 	// vec4 pos_in_map = u_map * pos_in_light;

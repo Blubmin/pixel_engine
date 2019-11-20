@@ -321,7 +321,7 @@ void SceneRenderer::Init() {
   g_buffer_->Bind();
   GLint tex_size = 0;
   glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tex_size);
-  shadow_buffer_ = std::make_shared<OglFramebuffer>(1 << 13, 1 << 13,
+  shadow_buffer_ = std::make_shared<OglFramebuffer>(1 << 11, 1 << 11,
                                                     std::vector<int32_t>({1}));
   shadow_buffer_->Bind();
   shadow_buffer_->SetClearColor(FLT_MAX, FLT_MAX, FLT_MAX);

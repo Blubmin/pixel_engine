@@ -3,5 +3,9 @@
 #include <Eigen/Core>
 
 namespace pxl {
-PhysicsComponent::PhysicsComponent() : velocity(Eigen::Vector3f::Zero()) {}
+PhysicsComponent::PhysicsComponent()
+    : PhysicsComponent(Eigen::Vector3f::Zero()) {}
+
+PhysicsComponent::PhysicsComponent(const Eigen::Vector3f& velocity)
+    : velocity(velocity) {}
 }  // namespace pxl

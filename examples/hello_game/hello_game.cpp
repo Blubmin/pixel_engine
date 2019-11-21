@@ -96,18 +96,18 @@ class HelloGame : public pxl::Game {
 
     scene = std::make_shared<pxl::Scene>();
     scene->camera = camera;
-    scene->entities.push_back(camera);
-    scene->entities.push_back(mesh);
-    scene->entities.push_back(child);
-    // scene->entities.push_back(child_child);
-    scene->entities.push_back(ground);
-    scene->entities.push_back(light);
-    scene->entities.push_back(light2);
-    // scene->entities.push_back(
+    scene->AddEntity(camera);
+    scene->AddEntity(mesh);
+    scene->AddEntity(child);
+    // scene->AddEntity(child_child);
+    scene->AddEntity(ground);
+    scene->AddEntity(light);
+    scene->AddEntity(light2);
+    // scene->AddEntity(
     //    std::make_shared<pxl::PointLight>(pxl::Color(1.f, 1.f, 1.f)));
     // scene->entities.back()->position += Eigen::Vector3f(0.f, 3.f, 0.f);
-    scene->entities.insert(scene->entities.end(), point_lights.begin(),
-                           point_lights.end());
+    scene->AddEntities(point_lights);
+                           
     scene->Bind();
   }
 
@@ -148,7 +148,7 @@ class HelloGame : public pxl::Game {
   std::shared_ptr<pxl::MeshEntity> mesh;
   std::shared_ptr<pxl::MeshEntity> ground;
   std::shared_ptr<pxl::Program> prog;
-  std::vector<std::shared_ptr<pxl::PointLight>> point_lights;
+  std::vector<std::shared_ptr<pxl::Entity>> point_lights;
 };
 
 int main(int argc, char* argv[]) {

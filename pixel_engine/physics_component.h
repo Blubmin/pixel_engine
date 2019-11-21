@@ -8,6 +8,7 @@ namespace pxl {
 class PhysicsComponent : public Component {
  public:
   PhysicsComponent();
+  PhysicsComponent(const Eigen::Vector3f& velocity);
 
   Eigen::Vector3f velocity;
 };

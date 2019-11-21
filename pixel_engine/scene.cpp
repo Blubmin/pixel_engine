@@ -14,8 +14,24 @@ namespace {
 const int kGridSize = 10;
 const float kAcceleration = -9.8;
 }  // namespace
+Scene::Scene() : debug_draw(false) {}
+
 void Scene::Update(float time_elapsed) {
-  for (auto entity : entities) {
+  // Add new entities to the scene
+  for (auto add : added_entities_) {
+    entities_.push_back(add);
+  }
+  added_entities_.clear();
+
+  // Remove entities from the scene
+  entities_.erase(std::remove_if(entities_.begin(), entities_.end(), [&](auto& entity) {
+    return std::find(removed_entities_.begin(), removed_entities_.end(),
+                     entity) != removed_entities_.end();
+  }), entities_.end());
+  removed_entities_.clear();
+
+  // Update all entities in the scene
+  for (auto entity : entities_) {
     entity->Update(time_elapsed);
     auto physics = entity->GetComponent<PhysicsComponent>();
     if (physics == nullptr) {
@@ -36,10 +52,10 @@ void Scene::Update(float time_elapsed) {
   btVector3 world_min(-500, -500, -500);
   btVector3 world_max(500, 500, 500);
   auto broad =
-      new bt32BitAxisSweep3(world_min, world_max, entities.size(), 0, true);
+      new bt32BitAxisSweep3(world_min, world_max, entities_.size(), 0, true);
   auto world = new btCollisionWorld(dispatcher, broad, config);
 
-  for (auto entity : entities) {
+  for (auto entity : entities_) {
     auto collider = entity->GetComponent<ColliderComponent>();
     if (collider == nullptr) {
       continue;
@@ -145,11 +161,25 @@ void Scene::Update(float time_elapsed) {
          btVector3(0, 1, 0).dot(-pt.m_normalWorldOnB) > .707)) {
       physics->velocity.y() = 0;
     }
+    if (physics != nullptr && type1 == ColliderComponent::kDynamic) {
+      Eigen::Vector3f norm =
+          Eigen::Map<Eigen::Vector3f>(pt.m_normalWorldOnB.m_floats);
+      physics->velocity = physics->velocity - 2 * (physics->velocity.dot(norm)) * norm;
+      physics->velocity *= .5;
+    }
+
+
     physics = collider2->owner.lock()->GetComponent<PhysicsComponent>();
     if (physics != nullptr &&
         (btVector3(0, 1, 0).dot(-pt.m_normalWorldOnB) > .707 ||
          btVector3(0, 1, 0).dot(-pt.m_normalWorldOnB) > .707)) {
       physics->velocity.y() = 0;
+    }
+    if (physics != nullptr && type2 == ColliderComponent::kDynamic) {
+      Eigen::Vector3f norm = -Eigen::Map<Eigen::Vector3f>(pt.m_normalWorldOnB.m_floats);
+      physics->velocity =
+          physics->velocity - 2 * (physics->velocity.dot(norm)) * norm;
+      physics->velocity *= .5;
     }
   }
 
@@ -219,6 +249,8 @@ void Scene::Bind() {
   glEnableVertexAttribArray(1);
 
   glBindVertexArray(0);
+
+  Update(0);
 }
 
 void Scene::DrawGrid() const {
@@ -233,5 +265,31 @@ void Scene::DrawPose() const {
   glLineWidth(2);
   glDrawArrays(GL_LINES, 0, 6);
   glBindVertexArray(0);
+}
+
+const std::vector<std::shared_ptr<Entity>>& Scene::GetEntities() const {
+  return entities_;
+}
+
+void Scene::AddEntity(
+    std::shared_ptr<Entity> entity) {
+  added_entities_.push_back(entity);
+}
+
+void Scene::AddEntities(std::vector<std::shared_ptr<Entity>> entities) {
+  for (auto entity : entities) {
+    added_entities_.push_back(entity);
+  }
+}
+
+void Scene::RemoveEntity(
+    std::shared_ptr<Entity> entity) {
+  removed_entities_.push_back(entity);
+}
+
+void Scene::RemoveEntities(std::vector<std::shared_ptr<Entity>> entities) {
+  for (auto entity : entities) {
+    removed_entities_.push_back(entity);
+  }
 }
 }  // namespace pxl

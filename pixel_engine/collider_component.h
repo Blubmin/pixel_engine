@@ -33,6 +33,12 @@ class CapsuleCollider : public ColliderComponent {
                   ColliderComponent::Type collider_type);
 };
 
+class SphereCollider : public ColliderComponent {
+ public:
+  SphereCollider(float radius,
+                  ColliderComponent::Type collider_type);
+};
+
 class BoxCollider : public ColliderComponent {
  public:
   BoxCollider(const Eigen::Vector3f& half_extents,

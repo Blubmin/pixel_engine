@@ -155,25 +155,27 @@ void SceneRenderer::RenderScene(const Scene& scene,
   }
   skybox_prog_->UnBind();
 
-  // Draw grid
-  grid_prog_->Bind();
-  grid_prog_->SetUniformMatrix4fv("u_perspective",
-                                  scene.camera->GetPerspective().data());
-  grid_prog_->SetUniformMatrix4fv("u_view", scene.camera->GetView().data());
-  scene.DrawGrid();
-  grid_prog_->UnBind();
+  if (scene.debug_draw) {
+    // Draw grid
+    grid_prog_->Bind();
+    grid_prog_->SetUniformMatrix4fv("u_perspective",
+                                    scene.camera->GetPerspective().data());
+    grid_prog_->SetUniformMatrix4fv("u_view", scene.camera->GetView().data());
+    scene.DrawGrid();
+    grid_prog_->UnBind();
 
-  // Draw pose
-  float viewport[4];
-  glGetFloatv(GL_VIEWPORT, viewport);
-  glViewport(0, 0, 100, 100);
-  pose_prog_->Bind();
-  auto view_matrix = scene.camera->GetView();
-  view_matrix.block<3, 1>(0, 3) << 0.f, 0.f, 0.f;
-  pose_prog_->SetUniformMatrix4fv("u_view", view_matrix.data());
-  scene.DrawPose();
-  pose_prog_->UnBind();
-  glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+    // Draw pose
+    float viewport[4];
+    glGetFloatv(GL_VIEWPORT, viewport);
+    glViewport(0, 0, 100, 100);
+    pose_prog_->Bind();
+    auto view_matrix = scene.camera->GetView();
+    view_matrix.block<3, 1>(0, 3) << 0.f, 0.f, 0.f;
+    pose_prog_->SetUniformMatrix4fv("u_view", view_matrix.data());
+    scene.DrawPose();
+    pose_prog_->UnBind();
+    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+  }
 }
 
 void SceneRenderer::RenderGBuffers(const Scene& scene, float gamma) {

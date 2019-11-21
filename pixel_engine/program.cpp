@@ -19,7 +19,6 @@ Program::Program(const boost::filesystem::path& vertex_shader,
   fragment_id_ = LoadShader(fragment_shader, GL_FRAGMENT_SHADER);
 
   prog_id_ = glCreateProgram();
-  LOG_IF(INFO, prog_id_ == 21) << fragment_shader;
   glAttachShader(prog_id_, vertex_id_);
   glAttachShader(prog_id_, fragment_id_);
 

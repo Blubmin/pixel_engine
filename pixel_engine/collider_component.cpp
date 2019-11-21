@@ -32,6 +32,12 @@ CapsuleCollider::CapsuleCollider(float radius, float height,
                         collider_type,
                         Eigen::Vector3f::UnitY() * (height / 2.f)) {}
 
+SphereCollider::SphereCollider(float radius,
+                               ColliderComponent::Type collider_type)
+    : ColliderComponent(
+          std::shared_ptr<btSphereShape>(new btSphereShape(radius)),
+          collider_type) {}
+
 BoxCollider::BoxCollider(const Eigen::Vector3f& half_extents,
                          ColliderComponent::Type collider_type)
     : ColliderComponent(

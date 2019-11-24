@@ -7,7 +7,7 @@
 #include <pixel_engine/skybox.h>
 
 namespace pxl {
-class Scene {
+class Scene : public std::enable_shared_from_this<Scene> {
  public:
   Scene();
   void Update(float time_elapsed);
@@ -45,6 +45,7 @@ class Scene {
   }
 
   const std::vector<std::shared_ptr<Entity>>& GetEntities() const;
+
   void AddEntity(
       std::shared_ptr<Entity> entity);
   void AddEntities(

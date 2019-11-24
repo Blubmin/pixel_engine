@@ -18,6 +18,7 @@ uniform PointLight u_point_lights[8];
 uniform DirectionalLight u_dir_light;
 uniform mat4 u_shadow;
 uniform mat4 u_map;
+uniform float u_opacity;
 
 // Constants
 const float c_gaussian[5] = {0.06136, .24477, .38774, .24477, .06136};
@@ -152,7 +153,6 @@ void main() {
 
 	final_color.rgb += compute_directional_light();
 	final_color.rgb = pow(final_color.rgb, vec3(1 / u_gamma));
-	final_color.a = clamp(length(u_camera_pos - pos), 0, 1);
 
 	// vec4 pos_in_light = u_shadow * vec4(pos, 1);
 	// vec4 pos_in_map = u_map * pos_in_light;

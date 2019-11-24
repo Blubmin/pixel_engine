@@ -65,8 +65,8 @@ void Scene::Update(float time_elapsed) {
   }
   world->performDiscreteCollisionDetection();
 
+  // Collision responses
   auto num_manifolds = world->getDispatcher()->getNumManifolds();
-
   for (int i = 0; i < num_manifolds; ++i) {
     auto manifold = world->getDispatcher()->getManifoldByIndexInternal(i);
     if (manifold->getNumContacts() != 1) {
@@ -79,6 +79,18 @@ void Scene::Update(float time_elapsed) {
     auto object2 = manifold->getBody1();
     auto collider2 = (ColliderComponent*)object2->getUserPointer();
     auto type2 = collider2->GetType();
+
+
+    // Call custom collision responses
+    auto responses = collider1->GetOwner()->GetComponents<CollisionResponse>();
+    for (auto response : responses) {
+      response->Respond(pt, object1, object2);
+    }
+    responses = collider2->GetOwner()->GetComponents<CollisionResponse>();
+    for (auto response : responses) {
+      response->Respond(pt, object2, object1);
+    }
+
 
     auto translation_vec = pt.m_normalWorldOnB.normalized() * pt.getDistance();
     auto angle = std::abs(btVector3(0, pt.m_normalWorldOnB.y() > 0 ? 1 : -1, 0)
@@ -273,6 +285,7 @@ const std::vector<std::shared_ptr<Entity>>& Scene::GetEntities() const {
 
 void Scene::AddEntity(
     std::shared_ptr<Entity> entity) {
+  entity->SetScene(shared_from_this());
   added_entities_.push_back(entity);
 }
 

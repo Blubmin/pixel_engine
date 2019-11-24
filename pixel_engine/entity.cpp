@@ -3,7 +3,10 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include <glog/logging.h> 
 #include <Eigen/Geometry>
+
+#include <pixel_engine/scene.h>
 
 namespace pxl {
 Entity::Entity(std::shared_ptr<Entity> parent)
@@ -51,5 +54,17 @@ Eigen::Matrix4f Entity::GetTransform() const {
       Eigen::AngleAxisf(rotation.z() * M_PI / 180, Eigen::Vector3f::UnitZ()) *
       Eigen::Scaling(scale);
   return transform.matrix();
+}
+
+void Entity::SetScene(std::weak_ptr<Scene> scene) { scene_ = scene; }
+
+void Entity::RemoveFromScene() {
+  auto scene_ptr = scene_.lock();
+  if (scene_ptr == nullptr) {
+    return;
+  }
+
+  scene_ptr->RemoveEntity(shared_from_this());
+  scene_.reset();
 }
 }  // namespace pxl

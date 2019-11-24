@@ -8,6 +8,8 @@
 #include <pixel_engine/component.h>
 
 namespace pxl {
+class Scene;
+
 class Entity : public std::enable_shared_from_this<Entity> {
  public:
   Entity(std::shared_ptr<Entity> parent = nullptr);
@@ -55,6 +57,8 @@ class Entity : public std::enable_shared_from_this<Entity> {
   }
 
   Eigen::Matrix4f GetTransform() const;
+  void SetScene(std::weak_ptr<Scene> scene);
+  void RemoveFromScene();
 
   std::weak_ptr<Entity> parent;
   std::vector<std::shared_ptr<Entity>> children;
@@ -65,6 +69,7 @@ class Entity : public std::enable_shared_from_this<Entity> {
   Eigen::Vector3f scale;
 
  protected:
+  std::weak_ptr<Scene> scene_;
   void SetParent(std::shared_ptr<Entity> parent);
 };
 }  // namespace pxl

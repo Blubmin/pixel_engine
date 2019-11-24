@@ -7,4 +7,8 @@ void Component::SetOwner(std::shared_ptr<Entity> owner) {
   }
   this->owner = owner;
 }
+
+std::shared_ptr<Entity> Component::GetOwner() const {
+  return owner.lock();
+}
 }  // namespace pxl

@@ -35,8 +35,7 @@ class CapsuleCollider : public ColliderComponent {
 
 class SphereCollider : public ColliderComponent {
  public:
-  SphereCollider(float radius,
-                  ColliderComponent::Type collider_type);
+  SphereCollider(float radius, ColliderComponent::Type collider_type);
 };
 
 class BoxCollider : public ColliderComponent {
@@ -53,5 +52,14 @@ class HullCollider : public ColliderComponent {
 class CombinedHullCollider : public ColliderComponent {
  public:
   CombinedHullCollider(const Mesh& mesh, ColliderComponent::Type collider_type);
+};
+
+class CollisionResponse : public Component {
+ public:
+  CollisionResponse() {}
+
+  virtual void Respond(btManifoldPoint& pt, const btCollisionObject* this_object,
+                        const btCollisionObject* other_object) {
+  }
 };
 }  // namespace pxl

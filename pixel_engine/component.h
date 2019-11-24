@@ -11,6 +11,7 @@ class Component {
   virtual void Update(float time_elapsed) {}
   virtual void Draw(const Program& prog) {}
   void SetOwner(std::shared_ptr<Entity> owner);
+  std::shared_ptr<Entity> GetOwner() const;
 
   std::weak_ptr<Entity> owner;
 };

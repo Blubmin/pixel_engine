@@ -40,8 +40,9 @@ Game::Game(const std::string &game_name) {
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-  State.window =
-      glfwCreateWindow(1920, 1080, State.game_name.c_str(), NULL, NULL);
+  int monitorcount = 0;
+  State.window = glfwCreateWindow(3840 / 2, 2160 / 2, State.game_name.c_str(),
+                                  /*glfwGetMonitors(&monitorcount)[2]*/ NULL, NULL);
   if (State.window == nullptr) {
     CHECK(false) << "glfwCreateWindow failed.";
   }

@@ -44,6 +44,12 @@ class BoxCollider : public ColliderComponent {
               ColliderComponent::Type collider_type);
 };
 
+class PlaneCollider : public ColliderComponent {
+ public:
+  PlaneCollider(const Eigen::Vector3f& normal, float offset,
+              ColliderComponent::Type collider_type);
+};
+
 class HullCollider : public ColliderComponent {
  public:
   HullCollider(const Mesh& mesh, ColliderComponent::Type collider_type);

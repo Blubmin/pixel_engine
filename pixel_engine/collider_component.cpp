@@ -45,6 +45,14 @@ BoxCollider::BoxCollider(const Eigen::Vector3f& half_extents,
               btVector3(half_extents.x(), half_extents.y(), half_extents.z()))),
           collider_type) {}
 
+PlaneCollider::PlaneCollider(const Eigen::Vector3f& normal, float offset,
+                             ColliderComponent::Type collider_type)
+    : ColliderComponent(std::shared_ptr<btStaticPlaneShape>(
+                            new btStaticPlaneShape(
+                                btVector3(normal.x(), normal.y(), normal.z()),
+                            offset)),
+                        collider_type) {}
+
 HullCollider::HullCollider(const Mesh& mesh,
                            ColliderComponent::Type collider_type)
     : ColliderComponent(std::shared_ptr<btCompoundShape>(new btCompoundShape()),

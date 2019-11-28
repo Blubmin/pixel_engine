@@ -33,5 +33,7 @@ class Game {
 
   static ThreadPool RenderingThread;
   static ThreadPool BackgroundThreadPool;
+
+  bool show_fps;
 };
 }  // namespace pxl

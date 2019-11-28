@@ -29,7 +29,7 @@ float GameState::GetAspectRatio() {
 
 GameState Game::State;
 
-Game::Game(const std::string &game_name) {
+Game::Game(const std::string &game_name) : show_fps(true) {
   State.game_name = game_name;
   State.window = nullptr;
 
@@ -41,8 +41,8 @@ Game::Game(const std::string &game_name) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
   int monitorcount = 0;
-  State.window = glfwCreateWindow(3840 / 2, 2160 / 2, State.game_name.c_str(),
-                                  /*glfwGetMonitors(&monitorcount)[2]*/ NULL, NULL);
+  State.window = glfwCreateWindow(3840, 2160, State.game_name.c_str(),
+                                  glfwGetMonitors(&monitorcount)[0], NULL);
   if (State.window == nullptr) {
     CHECK(false) << "glfwCreateWindow failed.";
   }
@@ -124,15 +124,17 @@ void Game::Run() {
     RenderingThread.Run();
 
     // Show fps
-    boost::format fps_format("%.02lf fps");
-    fps_format % ImGui::GetIO().Framerate;
-    ImVec2 fps_location =
-        ImVec2(State.window_width -
-                   ImGui::CalcTextSize(fps_format.str().c_str()).x,
-               0) +
-        ImVec2(-10, 10);
-    ImGui::GetOverlayDrawList()->AddText(fps_location, IM_COL32_WHITE,
-                                         fps_format.str().c_str());
+    if (show_fps) {
+      boost::format fps_format("%.02lf fps");
+      fps_format % ImGui::GetIO().Framerate;
+      ImVec2 fps_location =
+          ImVec2(State.window_width -
+                     ImGui::CalcTextSize(fps_format.str().c_str()).x,
+                 0) +
+          ImVec2(-10, 10);
+      ImGui::GetOverlayDrawList()->AddText(fps_location, IM_COL32_WHITE,
+                                           fps_format.str().c_str());
+    }
 
     // Rendering
     ImGui::Render();

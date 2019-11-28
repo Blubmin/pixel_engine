@@ -42,7 +42,8 @@ void Scene::Update(float time_elapsed) {
     entity->position += physics->velocity * time_elapsed;
     if (entity->position.y() < 0) {
       entity->position.y() = 0;
-      physics->velocity = Eigen::Vector3f::Zero();
+      // physics->velocity = Eigen::Vector3f::Zero();
+      physics->velocity.y() = 0;
     }
   }
 

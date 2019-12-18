@@ -41,8 +41,8 @@ Game::Game(const std::string &game_name) : show_fps(true) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
   int monitorcount = 0;
-  State.window = glfwCreateWindow(3840, 2160, State.game_name.c_str(),
-                                  glfwGetMonitors(&monitorcount)[0], NULL);
+  State.window = glfwCreateWindow(1920, 1080, State.game_name.c_str(),
+                                  NULL, NULL);
   if (State.window == nullptr) {
     CHECK(false) << "glfwCreateWindow failed.";
   }

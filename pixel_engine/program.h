@@ -35,6 +35,7 @@ class Program {
   GLuint fragment_id_;
   GLuint compute_id_;
 
+  std::string files_;
   std::map<std::string, GLuint> attributes_;
   std::map<std::string, GLuint> uniforms_;
 

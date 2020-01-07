@@ -14,7 +14,9 @@ const int kBufferSize = 255;
 }
 
 Program::Program(const boost::filesystem::path& vertex_shader,
-                 const boost::filesystem::path& fragment_shader) {
+                 const boost::filesystem::path& fragment_shader)
+    : files_(vertex_shader.filename().string() + " " +
+             fragment_shader.filename().string()) {
   vertex_id_ = LoadShader(vertex_shader, GL_VERTEX_SHADER);
   fragment_id_ = LoadShader(fragment_shader, GL_FRAGMENT_SHADER);
 
@@ -43,7 +45,8 @@ Program::Program(const boost::filesystem::path& vertex_shader,
   LoadUniforms();
 }
 
-Program::Program(const boost::filesystem::path& compute_shader) {
+Program::Program(const boost::filesystem::path& compute_shader)
+    : files_(compute_shader.filename().string()) {
   compute_id_ = LoadShader(compute_shader, GL_COMPUTE_SHADER);
 
   prog_id_ = glCreateProgram();
@@ -81,7 +84,7 @@ void Program::UnBind() { glUseProgram(0); }
 
 GLint Program::GetAttributeLocation(const std::string& name) const {
   if (attributes_.count(name) != 1) {
-    LOG(WARNING) << "No active attribute found with name " << name;
+    LOG(WARNING) << files_ << " | No active attribute found with name " << name;
     return -1;
   }
   return attributes_.at(name);
@@ -89,7 +92,7 @@ GLint Program::GetAttributeLocation(const std::string& name) const {
 
 GLint Program::GetUniformLocation(const std::string& name) const {
   if (uniforms_.count(name) != 1) {
-    LOG(WARNING) << "No active uniform found with name " << name;
+    LOG(WARNING) << files_ << " | No active uniform found with name " << name;
     return -1;
   }
   return uniforms_.at(name);

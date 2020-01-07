@@ -1,4 +1,4 @@
-#version 330
+#version 420
 
 #include "types.glsl"
 

@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <regex>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -83,16 +84,28 @@ void Program::Bind() { glUseProgram(prog_id_); }
 void Program::UnBind() { glUseProgram(0); }
 
 GLint Program::GetAttributeLocation(const std::string& name) const {
+  static std::set<std::string> logged_messages = std::set<std::string>();
+  std::string msg =
+      files_ + " | No active attribute found with name "
+      + name;
   if (attributes_.count(name) != 1) {
-    LOG(WARNING) << files_ << " | No active attribute found with name " << name;
+    if (logged_messages.count(msg) == 0) {
+      LOG(WARNING) << msg;
+      logged_messages.emplace(msg);
+    }
     return -1;
   }
   return attributes_.at(name);
 }
 
 GLint Program::GetUniformLocation(const std::string& name) const {
+  static std::set<std::string> logged_messages = std::set<std::string>();
+  std::string msg = files_ + " | No active uniform found with name " + name;
   if (uniforms_.count(name) != 1) {
-    LOG(WARNING) << files_ << " | No active uniform found with name " << name;
+    if (logged_messages.count(msg) == 0) {
+      LOG(WARNING) << msg;
+      logged_messages.emplace(msg);
+    }
     return -1;
   }
   return uniforms_.at(name);
